@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './Lista.css';
+import "./Lista.css";
 import {
   Table,
   TableBody,
@@ -30,6 +30,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import InputMask from "react-input-mask";
 import MuiAlert from "@mui/material/Alert";
+import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
+import { useNavigate } from "react-router-dom"; // Assumindo que você está usando react-router-dom
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -40,10 +42,15 @@ const Lista = () => {
   const [count, setCount] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState({ open: false, type: "", message: "" });
+  const [feedback, setFeedback] = useState({
+    open: false,
+    type: "",
+    message: "",
+  });
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [patientDialogOpen, setPatientDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const [newPaciente, setNewPaciente] = useState({
     nomePaciente: "",
@@ -70,7 +77,11 @@ const Lista = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      setFeedback({ open: true, type: "error", message: "Erro ao buscar pacientes" });
+      setFeedback({
+        open: true,
+        type: "error",
+        message: "Erro ao buscar pacientes",
+      });
     }
   };
 
@@ -93,20 +104,29 @@ const Lista = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/pacientes", newPaciente);
+      const response = await axios.post(
+        "http://localhost:5000/pacientes",
+        newPaciente
+      );
       setPacientes([...pacientes, response.data]);
       handleClose();
-      setFeedback({ open: true, type: "success", message: "Paciente cadastrado com sucesso" });
+      setFeedback({
+        open: true,
+        type: "success",
+        message: "Paciente cadastrado com sucesso",
+      });
     } catch (error) {
-      setFeedback({ open: true, type: "error", message: "Erro ao cadastrar paciente" });
+      setFeedback({
+        open: true,
+        type: "error",
+        message: "Erro ao cadastrar paciente",
+      });
     }
     setLoading(false);
   };
 
-  const handleMenuClick = (event, patient) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedPatient(patient);
-    setPatientDialogOpen(true);
+  const handleMenuClick = (event, paciente) => {
+    navigate(`/prontuarios/${paciente._id}`);
   };
 
   const handleMenuClose = () => {
@@ -171,7 +191,7 @@ const Lista = () => {
           </Button>
         </ThemeProvider>
       </div>
-      <Paper sx={{ borderRadius: "36px", boxShadow: "none", height: '80vh' }}>
+      <Paper sx={{ borderRadius: "36px", boxShadow: "none", height: "80vh" }}>
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>Cadastrar Paciente</DialogTitle>
           <DialogContent>
@@ -353,7 +373,7 @@ const Lista = () => {
                   textAlign: "center",
                 }}
               >
-                Ações
+                Prontuário
               </TableCell>
             </TableRow>
           </TableHead>
@@ -367,17 +387,29 @@ const Lista = () => {
                   {paciente.tipoSanguineo}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
-                  {today.getFullYear() - new Date(paciente.dataNascimento).getFullYear()}
+                  {today.getFullYear() -
+                    new Date(paciente.dataNascimento).getFullYear()}
                 </TableCell>
                 <TableCell sx={{ textAlign: "center" }}>
                   {paciente.cpfPaciente}
                 </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>
+                <TableCell sx={{
+                  textAlign: "center",
+                }}>
                   <IconButton
-                    aria-label="more"
-                    onClick={(event) => handleMenuClick(event, paciente)}
+                    aria-label="Prontuário"
+                    onClick={(event) => {
+                      console.log("Paciente:", paciente);
+                      if (paciente && paciente._id) {
+                        handleMenuClick(event, paciente);
+                      } else {
+                        console.error(
+                          "Paciente ou paciente._id está indefinido"
+                        );
+                      }
+                    }}
                   >
-                    <MoreVertIcon />
+                    <MedicalInformationIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -386,7 +418,12 @@ const Lista = () => {
         </Table>
       </Paper>
 
-      <Dialog open={patientDialogOpen} onClose={handleMenuClose} fullWidth maxWidth="md">
+      <Dialog
+        open={patientDialogOpen}
+        onClose={handleMenuClose}
+        fullWidth
+        maxWidth="md"
+      >
         <DialogTitle>Informações do Paciente</DialogTitle>
         <DialogContent>
           {selectedPatient && (
@@ -416,7 +453,10 @@ const Lista = () => {
                 label="Idade"
                 type="text"
                 fullWidth
-                value={today.getFullYear() - new Date(selectedPatient.dataNascimento).getFullYear()}
+                value={
+                  today.getFullYear() -
+                  new Date(selectedPatient.dataNascimento).getFullYear()
+                }
                 InputProps={{
                   readOnly: true,
                 }}
@@ -462,7 +502,10 @@ const Lista = () => {
         autoHideDuration={6000}
         onClose={() => setFeedback({ ...feedback, open: false })}
       >
-        <Alert onClose={() => setFeedback({ ...feedback, open: false })} severity={feedback.type}>
+        <Alert
+          onClose={() => setFeedback({ ...feedback, open: false })}
+          severity={feedback.type}
+        >
           {feedback.message}
         </Alert>
       </Snackbar>
