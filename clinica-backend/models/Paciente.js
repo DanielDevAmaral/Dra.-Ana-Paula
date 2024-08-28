@@ -8,6 +8,7 @@ const pacienteSchema = new mongoose.Schema({
   tipoSanguineo: String,
   dataNascimento: Date,
   cpfPaciente: String,
+  enderecoPaciente: String,
   nomeFamiliar: String,
   telefoneFamiliar: String,
   emailFamiliar: String,
@@ -36,3 +37,4 @@ const pacienteSchema = new mongoose.Schema({
 
 const Paciente = mongoose.model('Paciente', pacienteSchema);
 
+module.exports = Paciente;

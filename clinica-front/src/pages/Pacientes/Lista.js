@@ -30,7 +30,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import InputMask from "react-input-mask";
 import MuiAlert from "@mui/material/Alert";
-import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
+import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
 import { useNavigate } from "react-router-dom"; // Assumindo que você está usando react-router-dom
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -262,6 +262,15 @@ const Lista = () => {
                 max: today.toISOString().split("T")[0],
               }}
             />
+            <TextField
+              margin="dense"
+              name="enderecoPaciente"
+              label="Endereço do Paciente"
+              type="text"
+              fullWidth
+              value={newPaciente.enderecoPaciente}
+              onChange={handleChange}
+            />
             <InputMask
               mask="999.999.999-99"
               value={newPaciente.cpfPaciente}
@@ -393,9 +402,11 @@ const Lista = () => {
                 <TableCell sx={{ textAlign: "center" }}>
                   {paciente.cpfPaciente}
                 </TableCell>
-                <TableCell sx={{
-                  textAlign: "center",
-                }}>
+                <TableCell
+                  sx={{
+                    textAlign: "center",
+                  }}
+                >
                   <IconButton
                     aria-label="Prontuário"
                     onClick={(event) => {
