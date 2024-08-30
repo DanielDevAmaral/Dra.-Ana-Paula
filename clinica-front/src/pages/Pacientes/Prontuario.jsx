@@ -73,23 +73,28 @@ const Prontuario = () => {
         const anamnesisArray = response.data || []; // Assume que recebemos um array de anamnesis
   
         if (anamnesisArray.length > 0) {
-          // Mapeie para extrair e formatar os dados de planos terapêuticos e condutas
-          const formattedPlanos = anamnesisArray.map((anamnesis) => ({
-            plano: anamnesis.planoTerapeutico?.plano || "",
-            dataRegistro: anamnesis.planoTerapeutico?.dataRegistroPlano
-              ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano.$date || anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm')
-              : '',
-          }));
+          // Filtrar apenas os registros que possuem 'planoTerapeutico'
+          const filteredPlanos = anamnesisArray
+            .filter(anamnesis => anamnesis.planoTerapeutico)
+            .map(anamnesis => ({
+              plano: anamnesis.planoTerapeutico.plano || "",
+              dataRegistro: anamnesis.planoTerapeutico.dataRegistroPlano
+                ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano.$date || anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm')
+                : '',
+            }));
   
-          const formattedCondutas = anamnesisArray.map((anamnesis) => ({
-            conduta: anamnesis.conduta?.conduta || "",
-            dataRegistro: anamnesis.conduta?.dataRegistroConduta
-              ? format(new Date(anamnesis.conduta.dataRegistroConduta.$date || anamnesis.conduta.dataRegistroConduta), 'dd/MM/yyyy - HH:mm')
-              : '',
-          }));
+          // Filtrar apenas os registros que possuem 'conduta'
+          const filteredCondutas = anamnesisArray
+            .filter(anamnesis => anamnesis.conduta)
+            .map(anamnesis => ({
+              conduta: anamnesis.conduta.conduta || "",
+              dataRegistro: anamnesis.conduta.dataRegistroConduta
+                ? format(new Date(anamnesis.conduta.dataRegistroConduta.$date || anamnesis.conduta.dataRegistroConduta), 'dd/MM/yyyy - HH:mm')
+                : '',
+            }));
   
-          setPlanosTerapeuticos(formattedPlanos);
-          setCondutas(formattedCondutas);
+          setPlanosTerapeuticos(filteredPlanos);
+          setCondutas(filteredCondutas);
           setAnamnesisExists(true); // Defina como verdadeiro se houver registros
   
           // Atualize o estado principal de anamnesis se necessário
