@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const Paciente = require('./models/Paciente');
-const Prontuario = require('./models/Prontuario'); // Importar o modelo Prontuario
+const { format } = require('date-fns');
 
 const app = express();
 const PORT = 5000;
@@ -45,54 +45,111 @@ app.get('/pacientes/:pacienteId/anamnesis', async (req, res) => {
     try {
         const paciente = await Paciente.findById(req.params.pacienteId);
         if (!paciente) return res.status(404).send('Paciente não encontrado');
-        res.send(paciente);
+        res.send(paciente.anamnesis);
     } catch (error) {
         res.status(500).send('Erro ao buscar paciente');
     }
 });
 
-app.post('/pacientes/:id/anamnesis', async (req, res) => {
-    const { anamnesis } = req.body;
+
+// Rota para adicionar um novo plano terapêutico de um paciente específico
+app.put('/pacientes/:pacienteId/plano-terapeutico', async (req, res) => {
     try {
-        await Paciente.findByIdAndUpdate(req.params.id, { $push: { anamnesis } });
-        res.status(200).json({ message: "Anamnese salva com sucesso" });
+        const { pacienteId } = req.params;
+        const { planoTerapeutico, dataRegistroPlano } = req.body;
+
+        // Converte a string da data para um objeto Date
+        const dataRegistroPlanoDate = new Date(dataRegistroPlano);
+
+        if (isNaN(dataRegistroPlanoDate.getTime())) {
+            return res.status(400).send("Data inválida fornecida.");
+        }
+        
+
+        // Encontra o paciente
+        const paciente = await Paciente.findById(pacienteId);
+        if (!paciente) return res.status(404).send("Paciente não encontrado");
+
+        // Verifica se o array `anamnesis` existe; se não, inicializa como um array vazio
+        // Isso serve para quando o paciente é cadastrado pela primeira vez e parte de seus dados estão zerados
+        if (!paciente.anamnesis) {
+            paciente.anamnesis = [];
+        }
+
+        // Adiciona um novo objeto de plano terapêutico no array anamnesis
+        // Cria um novo registro
+        paciente.anamnesis.push({
+            planoTerapeutico: { plano: planoTerapeutico, dataRegistroPlano: dataRegistroPlanoDate }
+        });
+
+        // Salva o registro no banco
+        await paciente.save();
+
+        res.status(200).send("Plano terapêutico adicionado com sucesso");
     } catch (error) {
-        res.status(500).json({ message: "Erro ao salvar anamnese" });
+        console.error("Erro ao salvar plano terapêutico:", error);
+        res.status(500).send("Erro ao salvar plano terapêutico");
     }
 });
 
-
-// Rota para atualizar ou salvar a anamnese de um paciente específico
-app.post('/pacientes/:pacienteId/anamnesis', async (req, res) => {
+// Rota para adicionar uma nova conduta de um paciente específico
+app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
     try {
-        const paciente = await Paciente.findById(req.params.pacienteId);
+        const { pacienteId } = req.params;
+        const { conduta, dataRegistroConduta } = req.body;
+
+        // Converte a string da data para um objeto Date
+        const dataRegistroCondutaDate = new Date(dataRegistroConduta);
+
+        if (isNaN(dataRegistroCondutaDate.getTime())) {
+            return res.status(400).send("Data inválida fornecida.");
+        }
+
+        // Encontra o paciente
+        const paciente = await Paciente.findById(pacienteId);
         if (!paciente) return res.status(404).send("Paciente não encontrado");
 
-        // Update to use the correct field name
-        paciente.anaminese.push(req.body.anamnesisData);
+        // Verifica se o array `anamnesis` existe; se não, inicializa como um array vazio
+        if (!paciente.anamnesis) {
+            paciente.anamnesis = [];
+        }
+
+        // Adiciona um novo objeto de conduta no array anamnesis
+        paciente.anamnesis.push({
+            conduta: { conduta, dataRegistroConduta: dataRegistroCondutaDate }
+        });
 
         await paciente.save();
 
-        res.status(201).send("Anamnese salva com sucesso");
+        res.status(200).send("Conduta adicionada com sucesso");
     } catch (error) {
-        console.error("Error saving anamnesis:", error);
-        res.status(500).send("Erro ao salvar anamnese");
+        console.error("Erro ao salvar conduta:", error);
+        res.status(500).send("Erro ao salvar conduta");
     }
 });
 
 
-
-/* Rota para obter o prontuário de um paciente específico
-app.get('/prontuarios/:pacienteId', async (req, res) => {
+app.post('/pacientes/:pacienteId/anamnesis', async (req, res) => {
     try {
-        const prontuario = await Prontuario.findOne({ pacienteId: req.params.pacienteId });
-        if (!prontuario) return res.status(404).send('Prontuário não encontrado');
-        res.send(prontuario);
+        const { pacienteId } = req.params;
+        const anamnesisData = req.body.anamnesis[0]; // Extraindo o primeiro elemento do array
+
+        console.log('Dados recebidos:', anamnesisData);
+
+        // Atualize ou crie a anamnese
+        const result = await Paciente.findByIdAndUpdate(
+            pacienteId,
+            { $set: { anamnesis: [anamnesisData] } }, // Substituir o array
+            { new: true }
+        );
+
+        res.status(200).json(result);
     } catch (error) {
-        res.status(500).send('Erro ao buscar prontuário');
+        console.error('Erro ao salvar anamnese:', error);
+        res.status(500).json({ message: 'Erro ao salvar anamnese' });
     }
 });
-*/
+
 // Rota para salvar os dados do paciente
 app.post('/pacientes', async (req, res) => {
     try {
@@ -104,52 +161,6 @@ app.post('/pacientes', async (req, res) => {
     }
 });
 
-// Rota para salvar ou atualizar o prontuário de um paciente
-app.post('/prontuarios', async (req, res) => {
-    try {
-        const { pacienteId, ...prontuarioData } = req.body;
-        const prontuario = await Prontuario.findOneAndUpdate(
-            { pacienteId },
-            { ...prontuarioData, pacienteId },
-            { new: true, upsert: true }
-        );
-        res.status(201).send(prontuario);
-    } catch (error) {
-        res.status(400).send(error.message);
-    }
-});
-
-app.put('/pacientes/:pacienteId/plano-terapeutico', async (req, res) => {
-    const { planoTerapeutico, dataRegistroPlano } = req.body;
-  
-    try {
-      const paciente = await Paciente.findByIdAndUpdate(
-        req.params.pacienteId,
-        { $push: { "anamnesis.0.planosTerapeuticos": { planoTerapeutico, dataRegistroPlano } } },
-        { new: true }
-      );
-      if (!paciente) return res.status(404).send('Paciente não encontrado');
-      res.status(200).send(paciente);
-    } catch (error) {
-      res.status(500).send('Erro ao atualizar plano terapêutico');
-    }
-  });
-
-  app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
-    const { conduta, dataRegistroConduta } = req.body;
-  
-    try {
-      const paciente = await Paciente.findByIdAndUpdate(
-        req.params.pacienteId,
-        { $push: { "anamnesis.0.condutas": { conduta, dataRegistroConduta } } },
-        { new: true }
-      );
-      if (!paciente) return res.status(404).send('Paciente não encontrado');
-      res.status(200).send(paciente);
-    } catch (error) {
-      res.status(500).send('Erro ao atualizar conduta');
-    }
-  });
 
 // Iniciar o servidor
 app.listen(PORT, () => {

@@ -22,16 +22,16 @@ const pacienteSchema = new mongoose.Schema({
       exsudato: String,
       quantidadeExsudato: String,
       perilesao: String,
-      planoTerapeutico: String,
-      tecidosPresentes: {
-          Necrose: String,
-          NecroseLiquefacao: String,
-          Esfacelo: String,
-          Fibrina: String,
-          Granulacao: String,
-          Epitelizacao: String,
+
+      planoTerapeutico: {
+          plano: String,
+          dataRegistroPlano: Date
       },
-      conduta: String,
+      conduta: {
+          conduta: String,
+          dataRegistroConduta: Date
+      },
+      tecidosPresentes: [String],
   }]
 });
 

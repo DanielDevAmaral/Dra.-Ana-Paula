@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { format } from "date-fns";
 import {
   Grid,
+  Avatar,
   TextField,
   Button,
   FormControl,
@@ -23,6 +25,7 @@ import {
   IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'; // Ícone de substituição
 
 const Prontuario = () => {
   const { pacienteId } = useParams();
@@ -52,6 +55,10 @@ const Prontuario = () => {
   });
   const [openDialog, setOpenDialog] = useState(false);
   const [anamnesisExists, setAnamnesisExists] = useState(false);
+  const [paciente, setPaciente] = useState({
+    nomePaciente: "",
+    imagemPerfil: "", // Suponha que isso seja retornado pelo backend
+  });
 
   useEffect(() => {
     const fetchAnamnesisData = async () => {
@@ -60,9 +67,22 @@ const Prontuario = () => {
         const response = await axios.get(
           `http://localhost:5000/pacientes/${pacienteId}/anamnesis`
         );
-        const anamnesis = response.data.anamnesis?.[0] || {};
-        setPlanosTerapeuticos(anamnesis.map(a => ({ plano: a.planoTerapeutico, dataRegistro: a.dataRegistroPlano })));
-        setCondutas(anamnesis.map(a => ({ conduta: a.conduta, dataRegistro: a.dataRegistroConduta })));
+        const anamnesis = response.data?.[0] || {};
+          // Adicionando formatação de datas
+          const anamnesisFormatted = {
+            ...anamnesis,
+            planoTerapeutico: {
+              ...anamnesis.planoTerapeutico,
+              dataRegistroPlano: anamnesis.planoTerapeutico ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm') : '',
+            },
+            conduta: {
+              ...anamnesis.conduta,
+              dataRegistroConduta: anamnesis.conduta ? format(new Date(anamnesis.conduta.dataRegistroConduta), 'dd/MM/yyyy - HH:mm') : '',
+            }
+          };
+  
+          setPlanosTerapeuticos(anamnesisFormatted.planoTerapeutico ? [{ plano: anamnesisFormatted.planoTerapeutico.plano, dataRegistro: anamnesisFormatted.planoTerapeutico.dataRegistroPlano }] : []);
+          setCondutas(anamnesisFormatted.conduta ? [{ conduta: anamnesisFormatted.conduta.conduta, dataRegistro: anamnesisFormatted.conduta.dataRegistroConduta }] : []);
         if (Object.keys(anamnesis).length > 0) {
           setAnamnesisExists(true);
         }
@@ -91,7 +111,45 @@ const Prontuario = () => {
       }
     };
     fetchAnamnesisData();
+    const fetchPacienteData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/pacientes/${pacienteId}`
+        );
+        const pacienteData = response.data; // Suponha que você tenha nomePaciente e imagemPerfil
+        setPaciente({
+          nomePaciente: pacienteData.nomePaciente || "Paciente",
+          imagemPerfil: pacienteData.imagemPerfil || "", // Deixe em branco se não houver imagem
+        });
+      } catch (error) {
+        setFeedback({
+          open: true,
+          type: "error",
+          message: "Erro ao buscar dados do paciente",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPacienteData();
   }, [pacienteId]);
+
+  // Função para calcular a idade a partir da data de nascimento
+  const calcularIdade = (dataNascimento) => {
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento);
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const mes = hoje.getMonth() - nascimento.getMonth();
+
+    // Ajustar idade se o mês atual for menor que o mês de nascimento
+    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
+    }
+
+    return idade;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -110,31 +168,38 @@ const Prontuario = () => {
     }
   };
 
+  
+
   // Salvar Plano terapeutico
   const handleSavePlano = async () => {
-    const newPlano = {
-      planoTerapeutico: anamnesisData.planoTerapeutico,
-      dataRegistroPlano: new Date().toLocaleString(),
-    };
+    try {
+        const newPlano = {
+            planoTerapeutico: anamnesisData.planoTerapeutico,
+            dataRegistroPlano: new Date().toISOString(),  // Use ISO string for consistency
+        };
 
-    await axios.put(`/api/paciente/${pacienteId}/plano-terapeutico`, newPlano);
+        await axios.put(`http://localhost:5000/pacientes/${pacienteId}/plano-terapeutico`, newPlano);
+        setPlanosTerapeuticos(prevPlanos => [...prevPlanos, newPlano]);
+        setOpenPlanoForm(false);
+    } catch (error) {
+        console.error("Erro ao salvar plano terapêutico:", error);
+    }
+};
 
-    setPlanosTerapeuticos(prevPlanos => [...prevPlanos, newPlano]);
-    setOpenPlanoForm(false);
-  };
+const handleSaveConduta = async () => {
+    try {
+        const newConduta = {
+            conduta: anamnesisData.conduta,
+            dataRegistroConduta: new Date().toISOString(),  // Use ISO string for consistency
+        };
 
-    // Salvar Conduta
-    const handleSaveConduta = async () => {
-      const newConduta = {
-        conduta: anamnesisData.conduta,
-        dataRegistroConduta: new Date().toLocaleString(),
-      };
-  
-      await axios.put(`/api/paciente/${pacienteId}/conduta`, newConduta);
-  
-      setCondutas(prevCondutas => [...prevCondutas, newConduta]);
-      setOpenCondutaForm(false);
-    };
+        await axios.put(`http://localhost:5000/pacientes/${pacienteId}/conduta`, newConduta);
+        setCondutas(prevCondutas => [...prevCondutas, newConduta]);
+        setOpenCondutaForm(false);
+    } catch (error) {
+        console.error("Erro ao salvar conduta:", error);
+    }
+};
     
   const handleSubmit = async () => {
     setLoading(true);
@@ -190,6 +255,30 @@ const Prontuario = () => {
 
   return (
     <div>
+      <header>
+        <Grid container alignItems="center" spacing={2}>
+          <Grid item>
+            {/* Imagem de perfil ou ícone de usuário */}
+            {paciente.imagemPerfil ? (
+              <Avatar
+                src={paciente.imagemPerfil}
+                alt="Imagem do Paciente"
+                sx={{ width: 56, height: 56 }} // Tamanho circular
+              />
+            ) : (
+              <AccountCircleIcon sx={{ width: 56, height: 56 }} />
+            )}
+          </Grid>
+          <Grid item>
+            <Typography variant="h6" fontWeight="bold">
+              {paciente.nomePaciente}
+            </Typography>
+            <Typography variant="body2">
+            {paciente.dataNascimento ? calcularIdade(paciente.dataNascimento) : "Idade não disponível"}
+          </Typography>
+          </Grid>
+        </Grid>
+      </header>
       <Grid container spacing={3}>
         <Grid item xs={6}>
           <Button
