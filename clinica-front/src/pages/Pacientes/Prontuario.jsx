@@ -67,40 +67,53 @@ const Prontuario = () => {
         const response = await axios.get(
           `http://localhost:5000/pacientes/${pacienteId}/anamnesis`
         );
-        const anamnesis = response.data?.[0] || {};
-          // Adicionando formatação de datas
-          const anamnesisFormatted = {
-            ...anamnesis,
-            planoTerapeutico: {
-              ...anamnesis.planoTerapeutico,
-              dataRegistroPlano: anamnesis.planoTerapeutico ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm') : '',
-            },
-            conduta: {
-              ...anamnesis.conduta,
-              dataRegistroConduta: anamnesis.conduta ? format(new Date(anamnesis.conduta.dataRegistroConduta), 'dd/MM/yyyy - HH:mm') : '',
-            }
-          };
   
-          setPlanosTerapeuticos(anamnesisFormatted.planoTerapeutico ? [{ plano: anamnesisFormatted.planoTerapeutico.plano, dataRegistro: anamnesisFormatted.planoTerapeutico.dataRegistroPlano }] : []);
-          setCondutas(anamnesisFormatted.conduta ? [{ conduta: anamnesisFormatted.conduta.conduta, dataRegistro: anamnesisFormatted.conduta.dataRegistroConduta }] : []);
-        if (Object.keys(anamnesis).length > 0) {
-          setAnamnesisExists(true);
+        console.log('Resposta da API:', response.data); // Log da resposta da API
+  
+        const anamnesisArray = response.data || []; // Assume que recebemos um array de anamnesis
+  
+        if (anamnesisArray.length > 0) {
+          // Mapeie para extrair e formatar os dados de planos terapêuticos e condutas
+          const formattedPlanos = anamnesisArray.map((anamnesis) => ({
+            plano: anamnesis.planoTerapeutico?.plano || "",
+            dataRegistro: anamnesis.planoTerapeutico?.dataRegistroPlano
+              ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano.$date || anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm')
+              : '',
+          }));
+  
+          const formattedCondutas = anamnesisArray.map((anamnesis) => ({
+            conduta: anamnesis.conduta?.conduta || "",
+            dataRegistro: anamnesis.conduta?.dataRegistroConduta
+              ? format(new Date(anamnesis.conduta.dataRegistroConduta.$date || anamnesis.conduta.dataRegistroConduta), 'dd/MM/yyyy - HH:mm')
+              : '',
+          }));
+  
+          setPlanosTerapeuticos(formattedPlanos);
+          setCondutas(formattedCondutas);
+          setAnamnesisExists(true); // Defina como verdadeiro se houver registros
+  
+          // Atualize o estado principal de anamnesis se necessário
+          setAnamnesisData({
+            comorbidades: anamnesisArray[0].comorbidades || "",
+            localLesao: anamnesisArray[0].localLesao || "",
+            etiologia: anamnesisArray[0].etiologia || "",
+            tamanhoLesao: anamnesisArray[0].tamanhoLesao || "",
+            profundidadeLesao: anamnesisArray[0].profundidadeLesao || "",
+            bordasMargens: anamnesisArray[0].bordasMargens || "",
+            exsudato: anamnesisArray[0].exsudato || "",
+            quantidadeExsudato: anamnesisArray[0].quantidadeExsudato || "",
+            perilesao: anamnesisArray[0].perilesao || "",
+            planoTerapeutico: anamnesisArray[0].planoTerapeutico || "",
+            tecidosPresentes: anamnesisArray[0].tecidosPresentes || [],
+            conduta: anamnesisArray[0].conduta || "",
+          });
+        } else {
+          setPlanosTerapeuticos([]);
+          setCondutas([]);
+          setAnamnesisExists(false);
         }
-        setAnamnesisData({
-          comorbidades: anamnesis.comorbidades || "",
-          localLesao: anamnesis.localLesao || "",
-          etiologia: anamnesis.etiologia || "",
-          tamanhoLesao: anamnesis.tamanhoLesao || "",
-          profundidadeLesao: anamnesis.profundidadeLesao || "",
-          bordasMargens: anamnesis.bordasMargens || "",
-          exsudato: anamnesis.exsudato || "",
-          quantidadeExsudato: anamnesis.quantidadeExsudato || "",
-          perilesao: anamnesis.perilesao || "",
-          planoTerapeutico: anamnesis.planoTerapeutico || "",
-          tecidosPresentes: anamnesis.tecidosPresentes || [],
-          conduta: anamnesis.conduta || "",
-        });
       } catch (error) {
+        console.error('Erro ao buscar dados do prontuário:', error); // Log do erro detalhado
         setFeedback({
           open: true,
           type: "error",
@@ -110,7 +123,9 @@ const Prontuario = () => {
         setLoading(false);
       }
     };
+  
     fetchAnamnesisData();
+  
     const fetchPacienteData = async () => {
       setLoading(true);
       try {
@@ -123,6 +138,7 @@ const Prontuario = () => {
           imagemPerfil: pacienteData.imagemPerfil || "", // Deixe em branco se não houver imagem
         });
       } catch (error) {
+        console.error('Erro ao buscar dados do paciente:', error); // Log do erro detalhado
         setFeedback({
           open: true,
           type: "error",
@@ -132,10 +148,10 @@ const Prontuario = () => {
         setLoading(false);
       }
     };
-
+  
     fetchPacienteData();
   }, [pacienteId]);
-
+  
   // Função para calcular a idade a partir da data de nascimento
   const calcularIdade = (dataNascimento) => {
     const hoje = new Date();
