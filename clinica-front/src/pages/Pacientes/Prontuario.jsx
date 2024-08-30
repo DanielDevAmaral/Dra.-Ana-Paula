@@ -4,13 +4,8 @@ import { useParams } from "react-router-dom";
 import { format } from "date-fns";
 import {
   Grid,
-  Avatar,
   TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   CircularProgress,
   Snackbar,
   Alert,
@@ -18,14 +13,16 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Checkbox,
   Card,
   CardContent,
   Typography,
-  IconButton,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'; // Ícone de substituição
+
+import PatientHeader from "./PatientHeader";
+import CustomSelect from "./CustomSelect";
+import MultiSelectCheckbox from "./MultiSelectCheckbox";
+import PlanosCard from "./PlanosCard";
+import RegistroForm from "./RegistroForm";
 
 const Prontuario = () => {
   const { pacienteId } = useParams();
@@ -57,7 +54,8 @@ const Prontuario = () => {
   const [anamnesisExists, setAnamnesisExists] = useState(false);
   const [paciente, setPaciente] = useState({
     nomePaciente: "",
-    imagemPerfil: "", // Suponha que isso seja retornado pelo backend
+    imagemPerfil: "",
+    dataNascimento: "", // Assumi que isso será retornado pelo backend
   });
 
   useEffect(() => {
@@ -70,10 +68,9 @@ const Prontuario = () => {
   
         console.log('Resposta da API:', response.data); // Log da resposta da API
   
-        const anamnesisArray = response.data || []; // Assume que recebemos um array de anamnesis
+        const anamnesisArray = response.data || [];
   
         if (anamnesisArray.length > 0) {
-          // Filtrar apenas os registros que possuem 'planoTerapeutico'
           const filteredPlanos = anamnesisArray
             .filter(anamnesis => anamnesis.planoTerapeutico)
             .map(anamnesis => ({
@@ -82,8 +79,7 @@ const Prontuario = () => {
                 ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano.$date || anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm')
                 : '',
             }));
-  
-          // Filtrar apenas os registros que possuem 'conduta'
+
           const filteredCondutas = anamnesisArray
             .filter(anamnesis => anamnesis.conduta)
             .map(anamnesis => ({
@@ -95,9 +91,8 @@ const Prontuario = () => {
   
           setPlanosTerapeuticos(filteredPlanos);
           setCondutas(filteredCondutas);
-          setAnamnesisExists(true); // Defina como verdadeiro se houver registros
-  
-          // Atualize o estado principal de anamnesis se necessário
+          setAnamnesisExists(true);
+
           setAnamnesisData({
             comorbidades: anamnesisArray[0].comorbidades || "",
             localLesao: anamnesisArray[0].localLesao || "",
@@ -118,7 +113,7 @@ const Prontuario = () => {
           setAnamnesisExists(false);
         }
       } catch (error) {
-        console.error('Erro ao buscar dados do prontuário:', error); // Log do erro detalhado
+        console.error('Erro ao buscar dados do prontuário:', error);
         setFeedback({
           open: true,
           type: "error",
@@ -137,13 +132,14 @@ const Prontuario = () => {
         const response = await axios.get(
           `http://localhost:5000/pacientes/${pacienteId}`
         );
-        const pacienteData = response.data; // Suponha que você tenha nomePaciente e imagemPerfil
+        const pacienteData = response.data;
         setPaciente({
           nomePaciente: pacienteData.nomePaciente || "Paciente",
-          imagemPerfil: pacienteData.imagemPerfil || "", // Deixe em branco se não houver imagem
+          imagemPerfil: pacienteData.imagemPerfil || "",
+          dataNascimento: pacienteData.dataNascimento || "", // Suposição adicionada
         });
       } catch (error) {
-        console.error('Erro ao buscar dados do paciente:', error); // Log do erro detalhado
+        console.error('Erro ao buscar dados do paciente:', error);
         setFeedback({
           open: true,
           type: "error",
@@ -157,14 +153,12 @@ const Prontuario = () => {
     fetchPacienteData();
   }, [pacienteId]);
   
-  // Função para calcular a idade a partir da data de nascimento
   const calcularIdade = (dataNascimento) => {
     const hoje = new Date();
     const nascimento = new Date(dataNascimento);
     let idade = hoje.getFullYear() - nascimento.getFullYear();
     const mes = hoje.getMonth() - nascimento.getMonth();
 
-    // Ajustar idade se o mês atual for menor que o mês de nascimento
     if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
       idade--;
     }
@@ -174,8 +168,6 @@ const Prontuario = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Se for o campo 'tecidosPresentes', tratamos como um array de múltiplos valores
     if (name === "tecidosPresentes") {
       setAnamnesisData((prev) => ({
         ...prev,
@@ -189,62 +181,55 @@ const Prontuario = () => {
     }
   };
 
-  
-
-  // Salvar Plano terapeutico
   const handleSavePlano = async () => {
     try {
-        const newPlano = {
-            planoTerapeutico: anamnesisData.planoTerapeutico,
-            dataRegistroPlano: new Date().toISOString(),  // Use ISO string for consistency
-        };
+      const newPlano = {
+        planoTerapeutico: anamnesisData.planoTerapeutico,
+        dataRegistroPlano: new Date().toISOString(),
+      };
 
-        await axios.put(`http://localhost:5000/pacientes/${pacienteId}/plano-terapeutico`, newPlano);
-        setPlanosTerapeuticos(prevPlanos => [...prevPlanos, newPlano]);
-        setOpenPlanoForm(false);
+      await axios.put(`http://localhost:5000/pacientes/${pacienteId}/plano-terapeutico`, newPlano);
+      setPlanosTerapeuticos(prevPlanos => [...prevPlanos, newPlano]);
+      setOpenPlanoForm(false);
     } catch (error) {
-        console.error("Erro ao salvar plano terapêutico:", error);
+      console.error("Erro ao salvar plano terapêutico:", error);
     }
-};
+  };
 
-const handleSaveConduta = async () => {
+  const handleSaveConduta = async () => {
     try {
-        const newConduta = {
-            conduta: anamnesisData.conduta,
-            dataRegistroConduta: new Date().toISOString(),  // Use ISO string for consistency
-        };
+      const newConduta = {
+        conduta: anamnesisData.conduta,
+        dataRegistroConduta: new Date().toISOString(),
+      };
 
-        await axios.put(`http://localhost:5000/pacientes/${pacienteId}/conduta`, newConduta);
-        setCondutas(prevCondutas => [...prevCondutas, newConduta]);
-        setOpenCondutaForm(false);
+      await axios.put(`http://localhost:5000/pacientes/${pacienteId}/conduta`, newConduta);
+      setCondutas(prevCondutas => [...prevCondutas, newConduta]);
+      setOpenCondutaForm(false);
     } catch (error) {
-        console.error("Erro ao salvar conduta:", error);
+      console.error("Erro ao salvar conduta:", error);
     }
-};
-    
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Filtrar apenas os tecidos presentes selecionados
       const formattedAnamnesisData = {
         ...anamnesisData,
         tecidosPresentes: anamnesisData.tecidosPresentes,
       };
 
-      // Enviar o objeto formatado com as strings selecionadas para o backend
       await axios.post(
         `http://localhost:5000/pacientes/${pacienteId}/anamnesis`,
         { anamnesis: [formattedAnamnesisData] }
       );
 
-      // Feedback de sucesso
       setFeedback({
         open: true,
         type: "success",
         message: "Anamnese salva com sucesso",
       });
     } catch (error) {
-      // Feedback de erro
       setFeedback({
         open: true,
         type: "error",
@@ -255,50 +240,15 @@ const handleSaveConduta = async () => {
     }
   };
 
-  const renderSelect = (name, label, options) => (
-    <FormControl margin="dense" fullWidth>
-      <InputLabel>{label}</InputLabel>
-      <Select
-        name={name}
-        value={anamnesisData[name]}
-        onChange={handleChange}
-        label={label}
-        fullWidth
-      >
-        {options.map((option, index) => (
-          <MenuItem key={index} value={option}>
-            {option}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-
   return (
     <div>
       <header>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid item>
-            {/* Imagem de perfil ou ícone de usuário */}
-            {paciente.imagemPerfil ? (
-              <Avatar
-                src={paciente.imagemPerfil}
-                alt="Imagem do Paciente"
-                sx={{ width: 56, height: 56 }} // Tamanho circular
-              />
-            ) : (
-              <AccountCircleIcon sx={{ width: 56, height: 56 }} />
-            )}
-          </Grid>
-          <Grid item>
-            <Typography variant="h6" fontWeight="bold">
-              {paciente.nomePaciente}
-            </Typography>
-            <Typography variant="body2">
-            {paciente.dataNascimento ? calcularIdade(paciente.dataNascimento) : "Idade não disponível"}
-          </Typography>
-          </Grid>
-        </Grid>
+        <PatientHeader 
+          nome={paciente.nomePaciente} 
+          imagemPerfil={paciente.imagemPerfil}
+          dataNascimento={paciente.dataNascimento} 
+          calcularIdade={calcularIdade} 
+        />
       </header>
       <Grid container spacing={3}>
         <Grid item xs={6}>
@@ -349,100 +299,40 @@ const handleSaveConduta = async () => {
         </Grid>
       </Grid>
       <Grid container spacing={3} style={{ marginTop: 20 }}>
-      <Grid container spacing={3}>
-        {/* Card de Plano Terapêutico */}
         <Grid item xs={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Plano Terapeutico</Typography>
-              <IconButton color="primary" onClick={() => setOpenPlanoForm(true)}>
-                <AddIcon />
-              </IconButton>
-              {/* Mostrar o histórico de planos */}
-              {planosTerapeuticos.length > 0 ? (
-                planosTerapeuticos.map((plano, index) => (
-                  <Typography key={index}>
-                    <strong>{plano.plano}</strong> - {plano.dataRegistro}
-                  </Typography>
-                ))
-              ) : (
-                <Typography>Nenhum plano registrado</Typography>
-              )}
-            </CardContent>
-          </Card>
+          <PlanosCard 
+            title="Plano Terapêutico"
+            items={planosTerapeuticos}
+            handleOpenForm={() => setOpenPlanoForm(true)}
+          />
         </Grid>
 
-        {/* Card de Conduta */}
         <Grid item xs={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Conduta</Typography>
-              <IconButton color="primary" onClick={() => setOpenCondutaForm(true)}>
-                <AddIcon />
-              </IconButton>
-              {/* Mostrar o histórico de condutas */}
-              {condutas.length > 0 ? (
-                condutas.map((conduta, index) => (
-                  <Typography key={index}>
-                    <strong>{conduta.conduta}</strong> - {conduta.dataRegistro}
-                  </Typography>
-                ))
-              ) : (
-                <Typography>Nenhuma conduta registrada</Typography>
-              )}
-            </CardContent>
-          </Card>
+          <PlanosCard 
+            title="Conduta"
+            items={condutas}
+            handleOpenForm={() => setOpenCondutaForm(true)}
+          />
         </Grid>
-
-        {/* Formulário de Plano Terapêutico */}
-        <Dialog open={openPlanoForm} onClose={() => setOpenPlanoForm(false)}>
-          <DialogTitle>Registrar Plano Terapêutico</DialogTitle>
-          <DialogContent>
-            <TextField
-              margin="dense"
-              name="planoTerapeutico"
-              label="Plano Terapêutico"
-              type="text"
-              fullWidth
-              value={anamnesisData.planoTerapeutico}
-              onChange={handleChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenPlanoForm(false)} color="secondary">
-              Cancelar
-            </Button>
-            <Button onClick={handleSavePlano} color="primary">
-              Salvar
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Formulário de Conduta */}
-        <Dialog open={openCondutaForm} onClose={() => setOpenCondutaForm(false)}>
-          <DialogTitle>Registrar Conduta</DialogTitle>
-          <DialogContent>
-            <TextField
-              margin="dense"
-              name="conduta"
-              label="Conduta"
-              type="text"
-              fullWidth
-              value={anamnesisData.conduta}
-              onChange={handleChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenCondutaForm(false)} color="secondary">
-              Cancelar
-            </Button>
-            <Button onClick={handleSaveConduta} color="primary">
-              Salvar
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Grid>
-    </Grid>
+      <RegistroForm
+        open={openPlanoForm}
+        handleClose={() => setOpenPlanoForm(false)}
+        handleChange={handleChange}
+        handleSave={handleSavePlano}
+        value={anamnesisData.planoTerapeutico}
+        name="planoTerapeutico"
+        label="Plano Terapêutico"
+      />
+      <RegistroForm
+        open={openCondutaForm}
+        handleClose={() => setOpenCondutaForm(false)}
+        handleChange={handleChange}
+        handleSave={handleSaveConduta}
+        value={anamnesisData.conduta}
+        name="conduta"
+        label="Conduta"
+      />
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Fazer Anamnese</DialogTitle>
         <DialogContent>
@@ -456,16 +346,22 @@ const handleSaveConduta = async () => {
               value={anamnesisData.comorbidades}
               onChange={handleChange}
             />
-            {renderSelect("etiologia", "Etiologia da Lesão", [
-              "LPP",
-              "Lesão Traumatica",
-              "Deisciência",
-              "Úlcera Diabética",
-              "Úlcera Venosa",
-              "Úlcera Arterial",
-              "Lesão Tumoral",
-              "Outros",
-            ])}
+            <CustomSelect 
+              name="etiologia"
+              label="Etiologia da Lesão"
+              options={[
+                "LPP",
+                "Lesão Traumatica",
+                "Deisciência",
+                "Úlcera Diabética",
+                "Úlcera Venosa",
+                "Úlcera Arterial",
+                "Lesão Tumoral",
+                "Outros",
+              ]}
+              value={anamnesisData.etiologia}
+              handleChange={handleChange}
+            />
             <TextField
               margin="dense"
               name="tamanhoLesao"
@@ -475,82 +371,83 @@ const handleSaveConduta = async () => {
               value={anamnesisData.tamanhoLesao}
               onChange={handleChange}
             />
-            {renderSelect("profundidadeLesao", "Profundidade", [
-              "Tecido Danificado sem rompimento de epiderme",
-              "Superficial",
-              "Profunda com acometimento de tecido adjacentes",
-              "Não classificável",
-              "Acometimentos de estruturas de suporte (tendões, articulações)",
-              "Epitelizada",
-              "Cicatrizada",
-            ])}
-            <FormControl margin="dense" fullWidth>
-              <InputLabel>Tecidos Presentes</InputLabel>
-              <Select
-                multiple
-                name="tecidosPresentes"
-                value={anamnesisData.tecidosPresentes} // Usamos a array diretamente
-                onChange={(e) =>
-                  handleChange({
-                    target: { name: "tecidosPresentes", value: e.target.value },
-                  })
-                }
-                renderValue={(selected) => selected.join(", ")}
-                label="Tecidos Presentes"
-                fullWidth
-              >
-                {[
-                  "Necrose",
-                  "NecroseLiquefacao",
-                  "Esfacelo",
-                  "Fibrina",
-                  "Granulacao",
-                  "Epitelizacao",
-                ].map((tecido) => (
-                  <MenuItem key={tecido} value={tecido}>
-                    <Checkbox
-                      checked={anamnesisData.tecidosPresentes.includes(tecido)}
-                    />
-                    {tecido}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            {renderSelect("bordasMargens", "Bordas / Margens", [
-              "Aderidas",
-              "Não aderidas",
-              "Descoladas",
-              "Com presença de Epitelização",
-            ])}
-            {renderSelect("exsudato", "Exsudato", [
-              "Seroso",
-              "Serosanguinolento",
-              "Purulento",
-              "Quantidade",
-            ])}
-            {renderSelect("perilesao", "Perilesão", [
-              "Eritema",
-              "Edema",
-              "Dermatite",
-              "Maceração",
-              "Induração",
-              "Ressecamento",
-              "Descamação",
-              "Sensibilidade",
-              "Ausência de pelos",
-            ])}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : "Salvar Anamnese"}
-            </Button>
+            <CustomSelect 
+              name="profundidadeLesao"
+              label="Profundidade"
+              options={[
+                "Tecido Danificado sem rompimento de epiderme",
+                "Superficial",
+                "Profunda com acometimento de tecido adjacentes",
+                "Não classificável",
+                "Acometimentos de estruturas de suporte (tendões, articulações)",
+                "Epitelizada",     "Cicatrizada",
+              ]}
+              value={anamnesisData.profundidadeLesao}
+              handleChange={handleChange}
+            />
+            <MultiSelectCheckbox 
+              name="tecidosPresentes"
+              label="Tecidos Presentes"
+              options={[
+                "Necrose",
+                "NecroseLiquefacao",
+                "Esfacelo",
+                "Fibrina",
+                "Granulacao",
+                "Epitelizacao",
+              ]}
+              value={anamnesisData.tecidosPresentes}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="bordasMargens"
+              label="Bordas / Margens"
+              options={[
+                "Aderidas",
+                "Não aderidas",
+                "Descoladas",
+                "Com presença de Epitelização",
+              ]}
+              value={anamnesisData.bordasMargens}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="exsudato"
+              label="Exsudato"
+              options={[
+                "Seroso",
+                "Serosanguinolento",
+                "Purulento",
+                "Quantidade",
+              ]}
+              value={anamnesisData.exsudato}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="perilesao"
+              label="Perilesão"
+              options={[
+                "Eritema",
+                "Edema",
+                "Dermatite",
+                "Maceração",
+                "Induração",
+                "Ressecamento",
+                "Descamação",
+                "Sensibilidade",
+                "Ausência de pelos",
+              ]}
+              value={anamnesisData.perilesao}
+              handleChange={handleChange}
+            />
+
           </form>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="secondary">
+          <Button onClick={handleSubmit} color="primary" disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : "Salvar"}
+            </Button>
+          <Button onClick={() => setOpenDialog(false)}>
             Fechar
           </Button>
         </DialogActions>
