@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { format } from "date-fns";
+import './Prontuario.css'
 import {
   Grid,
+  Divider,
   TextField,
   Button,
   CircularProgress,
@@ -65,30 +67,42 @@ const Prontuario = () => {
         const response = await axios.get(
           `http://localhost:5000/pacientes/${pacienteId}/anamnesis`
         );
-  
-        console.log('Resposta da API:', response.data); // Log da resposta da API
-  
+
+        console.log("Resposta da API:", response.data); // Log da resposta da API
+
         const anamnesisArray = response.data || [];
-  
+
         if (anamnesisArray.length > 0) {
           const filteredPlanos = anamnesisArray
-            .filter(anamnesis => anamnesis.planoTerapeutico)
-            .map(anamnesis => ({
+            .filter((anamnesis) => anamnesis.planoTerapeutico)
+            .map((anamnesis) => ({
               plano: anamnesis.planoTerapeutico.plano || "",
               dataRegistro: anamnesis.planoTerapeutico.dataRegistroPlano
-                ? format(new Date(anamnesis.planoTerapeutico.dataRegistroPlano.$date || anamnesis.planoTerapeutico.dataRegistroPlano), 'dd/MM/yyyy - HH:mm')
-                : '',
+                ? format(
+                    new Date(
+                      anamnesis.planoTerapeutico.dataRegistroPlano.$date ||
+                        anamnesis.planoTerapeutico.dataRegistroPlano
+                    ),
+                    "dd/MM/yyyy - HH:mm"
+                  )
+                : "",
             }));
 
           const filteredCondutas = anamnesisArray
-            .filter(anamnesis => anamnesis.conduta)
-            .map(anamnesis => ({
+            .filter((anamnesis) => anamnesis.conduta)
+            .map((anamnesis) => ({
               conduta: anamnesis.conduta.conduta || "",
               dataRegistro: anamnesis.conduta.dataRegistroConduta
-                ? format(new Date(anamnesis.conduta.dataRegistroConduta.$date || anamnesis.conduta.dataRegistroConduta), 'dd/MM/yyyy - HH:mm')
-                : '',
+                ? format(
+                    new Date(
+                      anamnesis.conduta.dataRegistroConduta.$date ||
+                        anamnesis.conduta.dataRegistroConduta
+                    ),
+                    "dd/MM/yyyy - HH:mm"
+                  )
+                : "",
             }));
-  
+
           setPlanosTerapeuticos(filteredPlanos);
           setCondutas(filteredCondutas);
           setAnamnesisExists(true);
@@ -113,7 +127,7 @@ const Prontuario = () => {
           setAnamnesisExists(false);
         }
       } catch (error) {
-        console.error('Erro ao buscar dados do prontuário:', error);
+        console.error("Erro ao buscar dados do prontuário:", error);
         setFeedback({
           open: true,
           type: "error",
@@ -123,9 +137,9 @@ const Prontuario = () => {
         setLoading(false);
       }
     };
-  
+
     fetchAnamnesisData();
-  
+
     const fetchPacienteData = async () => {
       setLoading(true);
       try {
@@ -139,7 +153,7 @@ const Prontuario = () => {
           dataNascimento: pacienteData.dataNascimento || "", // Suposição adicionada
         });
       } catch (error) {
-        console.error('Erro ao buscar dados do paciente:', error);
+        console.error("Erro ao buscar dados do paciente:", error);
         setFeedback({
           open: true,
           type: "error",
@@ -149,10 +163,10 @@ const Prontuario = () => {
         setLoading(false);
       }
     };
-  
+
     fetchPacienteData();
   }, [pacienteId]);
-  
+
   const calcularIdade = (dataNascimento) => {
     const hoje = new Date();
     const nascimento = new Date(dataNascimento);
@@ -188,8 +202,11 @@ const Prontuario = () => {
         dataRegistroPlano: new Date().toISOString(),
       };
 
-      await axios.put(`http://localhost:5000/pacientes/${pacienteId}/plano-terapeutico`, newPlano);
-      setPlanosTerapeuticos(prevPlanos => [...prevPlanos, newPlano]);
+      await axios.put(
+        `http://localhost:5000/pacientes/${pacienteId}/plano-terapeutico`,
+        newPlano
+      );
+      setPlanosTerapeuticos((prevPlanos) => [...prevPlanos, newPlano]);
       setOpenPlanoForm(false);
     } catch (error) {
       console.error("Erro ao salvar plano terapêutico:", error);
@@ -203,8 +220,11 @@ const Prontuario = () => {
         dataRegistroConduta: new Date().toISOString(),
       };
 
-      await axios.put(`http://localhost:5000/pacientes/${pacienteId}/conduta`, newConduta);
-      setCondutas(prevCondutas => [...prevCondutas, newConduta]);
+      await axios.put(
+        `http://localhost:5000/pacientes/${pacienteId}/conduta`,
+        newConduta
+      );
+      setCondutas((prevCondutas) => [...prevCondutas, newConduta]);
       setOpenCondutaForm(false);
     } catch (error) {
       console.error("Erro ao salvar conduta:", error);
@@ -243,11 +263,11 @@ const Prontuario = () => {
   return (
     <div>
       <header>
-        <PatientHeader 
-          nome={paciente.nomePaciente} 
+        <PatientHeader
+          nome={paciente.nomePaciente}
           imagemPerfil={paciente.imagemPerfil}
-          dataNascimento={paciente.dataNascimento} 
-          calcularIdade={calcularIdade} 
+          dataNascimento={paciente.dataNascimento}
+          calcularIdade={calcularIdade}
         />
       </header>
       <Grid container spacing={3}>
@@ -263,36 +283,53 @@ const Prontuario = () => {
         <Grid item xs={6}>
           <Card>
             <CardContent>
-              <Typography variant="h6" className="header">
+              <Typography variant="h6" className="header" align="center" marginBottom={1}>
                 DADOS GERAIS
               </Typography>
+              <Divider style={{ marginBottom: '16px' }} /> 
               <div className="data">
-                <ol>
-                  <li className="data-item">
-                    LOCALIZAÇÃO DA LESÃO: {anamnesisData.localLesao}
-                  </li>
-                  <li className="data-item">
-                    ETIOLOGIA DA LESÃO: {anamnesisData.etiologia}
-                  </li>
-                  <li className="data-item">
-                    TAMANHO DA LESÃO: {anamnesisData.tamanhoLesao}
-                  </li>
-                  <li className="data-item">
-                    PROFUNDIDADE DA LESÃO: {anamnesisData.profundidadeLesao}
-                  </li>
-                  <li className="data-item">
-                    BORDAS E MARGENS: {anamnesisData.bordasMargens}
-                  </li>
-                  <li className="data-item">
-                    TIPO DE EXSUDATO: {anamnesisData.exsudato}
-                  </li>
-                  <li className="data-item">
-                    QUANTIDADE DE EXSUDATO: {anamnesisData.quantidadeExsudato}
-                  </li>
-                  <li className="data-item">
-                    PERILESÃO: {anamnesisData.perilesao}
-                  </li>
-                </ol>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>LOCALIZAÇÃO DA LESÃO:</strong> {(anamnesisData.localLesao).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>ETIOLOGIA DA LESÃO:</strong> {(anamnesisData.etiologia).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>TAMANHO DA LESÃO:</strong> {(anamnesisData.tamanhoLesao).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>PROFUNDIDADE DA LESÃO:</strong> {(anamnesisData.profundidadeLesao).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>BORDAS E MARGENS:</strong> {(anamnesisData.bordasMargens).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>TIPO DE EXSUDATO:</strong> {(anamnesisData.exsudato).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>QUANTIDADE DE EXSUDATO:</strong> {(anamnesisData.quantidadeExsudato).toUpperCase()}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                    <strong>PERILESÃO:</strong> {(anamnesisData.perilesao).toUpperCase()}
+                    </div>
+                  </Grid>
+                </Grid>
               </div>
             </CardContent>
           </Card>
@@ -300,7 +337,7 @@ const Prontuario = () => {
       </Grid>
       <Grid container spacing={3} style={{ marginTop: 20 }}>
         <Grid item xs={6}>
-          <PlanosCard 
+          <PlanosCard
             title="Plano Terapêutico"
             items={planosTerapeuticos}
             handleOpenForm={() => setOpenPlanoForm(true)}
@@ -308,7 +345,7 @@ const Prontuario = () => {
         </Grid>
 
         <Grid item xs={6}>
-          <PlanosCard 
+          <PlanosCard
             title="Conduta"
             items={condutas}
             handleOpenForm={() => setOpenCondutaForm(true)}
@@ -346,7 +383,7 @@ const Prontuario = () => {
               value={anamnesisData.comorbidades}
               onChange={handleChange}
             />
-            <CustomSelect 
+            <CustomSelect
               name="etiologia"
               label="Etiologia da Lesão"
               options={[
@@ -371,7 +408,7 @@ const Prontuario = () => {
               value={anamnesisData.tamanhoLesao}
               onChange={handleChange}
             />
-            <CustomSelect 
+            <CustomSelect
               name="profundidadeLesao"
               label="Profundidade"
               options={[
@@ -380,12 +417,13 @@ const Prontuario = () => {
                 "Profunda com acometimento de tecido adjacentes",
                 "Não classificável",
                 "Acometimentos de estruturas de suporte (tendões, articulações)",
-                "Epitelizada",     "Cicatrizada",
+                "Epitelizada",
+                "Cicatrizada",
               ]}
               value={anamnesisData.profundidadeLesao}
               handleChange={handleChange}
             />
-            <MultiSelectCheckbox 
+            <MultiSelectCheckbox
               name="tecidosPresentes"
               label="Tecidos Presentes"
               options={[
@@ -440,16 +478,13 @@ const Prontuario = () => {
               value={anamnesisData.perilesao}
               handleChange={handleChange}
             />
-
           </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleSubmit} color="primary" disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : "Salvar"}
-            </Button>
-          <Button onClick={() => setOpenDialog(false)}>
-            Fechar
+            {loading ? <CircularProgress size={24} /> : "Salvar"}
           </Button>
+          <Button onClick={() => setOpenDialog(false)}>Fechar</Button>
         </DialogActions>
       </Dialog>
       <Snackbar
