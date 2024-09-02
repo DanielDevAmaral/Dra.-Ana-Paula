@@ -96,14 +96,10 @@ app.put('/pacientes/:pacienteId/plano-terapeutico', async (req, res) => {
 app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
     try {
         const { pacienteId } = req.params;
-        const { conduta, dataRegistroConduta } = req.body;
+        const { conduta } = req.body;
 
-        // Converte a string da data para um objeto Date
-        const dataRegistroCondutaDate = new Date(dataRegistroConduta);
-
-        if (isNaN(dataRegistroCondutaDate.getTime())) {
-            return res.status(400).send("Data inválida fornecida.");
-        }
+        // Log para verificar os dados recebidos
+        console.log("Dados recebidos:", conduta);
 
         // Encontra o paciente
         const paciente = await Paciente.findById(pacienteId);
@@ -115,10 +111,12 @@ app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
         }
 
         // Adiciona um novo objeto de conduta no array anamnesis
-        paciente.anamnesis.push({
-            conduta: { conduta, dataRegistroConduta: dataRegistroCondutaDate }
-        });
+        paciente.anamnesis.push({ conduta });
 
+        // Log para verificar o objeto paciente atualizado
+        console.log("Paciente após adicionar conduta:", paciente);
+
+        // Salva o paciente atualizado no banco de dados
         await paciente.save();
 
         res.status(200).send("Conduta adicionada com sucesso");
@@ -127,6 +125,7 @@ app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
         res.status(500).send("Erro ao salvar conduta");
     }
 });
+
 
 
 app.post('/pacientes/:pacienteId/anamnesis', async (req, res) => {

@@ -1,3 +1,5 @@
+// MODELO ANTIGO
+/*
 const mongoose = require('mongoose');
 
 // Definir o esquema do paciente
@@ -38,9 +40,10 @@ const pacienteSchema = new mongoose.Schema({
 const Paciente = mongoose.model('Paciente', pacienteSchema);
 
 module.exports = Paciente;
+*/
 
 // NOVO MODELO ABAIXO
-/*
+
 const mongoose = require('mongoose');
 
 // Definir o esquema do paciente
@@ -55,8 +58,8 @@ const pacienteSchema = new mongoose.Schema({
   nomeFamiliar: String,
   telefoneFamiliar: String,
   emailFamiliar: String,
-  medicaçõesEmUso: [String], // Lista de medicações
-  profissão: String,
+  medicacoesEmUso: [String], // Lista de medicações
+  profissao: String,
   sexo: { type: String, enum: ['Masculino', 'Feminino', 'Outro'] }, // Opções de sexo
   peso: Number, // Peso do paciente
   altura: Number, // Altura do paciente
@@ -75,23 +78,31 @@ const pacienteSchema = new mongoose.Schema({
           plano: String,
           dataRegistroPlano: Date
       },
+
+      // Substituição do campo 'conduta' com os novos dados
       conduta: {
-          conduta: String,
-          dataRegistroConduta: Date
+          tipoDesbridamento: String,    // Tipo de desbridamento
+          solucaoLimpeza: String,       // Solução de limpeza
+          protecaoPerilesao: String,    // Proteção de perilesão
+          coberturaPrimaria: String,    // Cobertura Primária
+          coberturaSecundaria: String,  // Cobertura Secundária
+          fixacao: String,              // Fixação
+          periodoTrocaCobertura: String, // Período de troca da cobertura
+          usoTerapiaAdjuvante: String   // Fez uso de terapia adjuvante
       },
+
       tecidosPresentes: [String],
 
       // Novos campos na anamnese
-      esporte: { type: Boolean, default: false }, // Esporte? Sim ou Não
-      medicamento: { type: Boolean, default: false }, // Medicamento? Sim ou Não
+      esporte: { type: Boolean }, // Esporte? Sim ou Não
+      medicamento: { type: Boolean }, // Medicamento? Sim ou Não
       alergico: String, // Descrição de alergias
-      gravida: { type: Boolean, default: false }, // Está grávida? Sim ou Não
-      amamentando: { type: Boolean, default: false }, // Amamentando? Sim ou Não
-      fumante: { type: Boolean, default: false } // Fumante? Sim ou Não
+      gravida: { type: Boolean }, // Está grávida? Sim ou Não
+      amamentando: { type: Boolean }, // Amamentando? Sim ou Não
+      fumante: { type: Boolean } // Fumante? Sim ou Não
   }]
 });
 
 const Paciente = mongoose.model('Paciente', pacienteSchema);
 
 module.exports = Paciente;
-*/

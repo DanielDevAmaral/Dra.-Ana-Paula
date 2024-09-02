@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { format } from "date-fns";
-import './Prontuario.css'
+import { FaCircleArrowRight } from "react-icons/fa6";
+import "./Prontuario.css";
 import {
   Grid,
   Divider,
@@ -25,6 +26,7 @@ import CustomSelect from "./CustomSelect";
 import MultiSelectCheckbox from "./MultiSelectCheckbox";
 import PlanosCard from "./PlanosCard";
 import RegistroForm from "./RegistroForm";
+import CondutasCard from "./CondutasCard";
 
 const Prontuario = () => {
   const { pacienteId } = useParams();
@@ -40,7 +42,16 @@ const Prontuario = () => {
     perilesao: "",
     planoTerapeutico: "",
     tecidosPresentes: [],
-    conduta: "",
+    conduta: {
+      tipoDesbridamento: "",
+      solucaoLimpeza: "",
+      protecaoPerilesao: "",
+      coberturaPrimaria: "",
+      coberturaSecundaria: "",
+      fixacao: "",
+      periodoTrocaCobertura: "",
+      usoTerapiaAdjuvante: "",
+    },
   });
   const [openPlanoForm, setOpenPlanoForm] = useState(false);
   const [openCondutaForm, setOpenCondutaForm] = useState(false);
@@ -88,19 +99,17 @@ const Prontuario = () => {
                 : "",
             }));
 
-          const filteredCondutas = anamnesisArray
+            const filteredCondutas = anamnesisArray
             .filter((anamnesis) => anamnesis.conduta)
             .map((anamnesis) => ({
-              conduta: anamnesis.conduta.conduta || "",
-              dataRegistro: anamnesis.conduta.dataRegistroConduta
-                ? format(
-                    new Date(
-                      anamnesis.conduta.dataRegistroConduta.$date ||
-                        anamnesis.conduta.dataRegistroConduta
-                    ),
-                    "dd/MM/yyyy - HH:mm"
-                  )
-                : "",
+              tipoDesbridamento: anamnesis.conduta.tipoDesbridamento || "",
+              solucaoLimpeza: anamnesis.conduta.solucaoLimpeza || "",
+              protecaoPerilesao: anamnesis.conduta.protecaoPerilesao || "",
+              coberturaPrimaria: anamnesis.conduta.coberturaPrimaria || "",
+              coberturaSecundaria: anamnesis.conduta.coberturaSecundaria || "",
+              fixacao: anamnesis.conduta.fixacao || "",
+              periodoTrocaCobertura: anamnesis.conduta.periodoTrocaCobertura || "",
+              usoTerapiaAdjuvante: anamnesis.conduta.usoTerapiaAdjuvante || "",
             }));
 
           setPlanosTerapeuticos(filteredPlanos);
@@ -182,17 +191,13 @@ const Prontuario = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "tecidosPresentes") {
-      setAnamnesisData((prev) => ({
-        ...prev,
-        tecidosPresentes: value,
-      }));
-    } else {
-      setAnamnesisData((prev) => ({
-        ...prev,
+    setAnamnesisData((prevData) => ({
+      ...prevData,
+      conduta: {
+        ...prevData.conduta,
         [name]: value,
-      }));
-    }
+      },
+    }));
   };
 
   const handleSavePlano = async () => {
@@ -216,8 +221,16 @@ const Prontuario = () => {
   const handleSaveConduta = async () => {
     try {
       const newConduta = {
-        conduta: anamnesisData.conduta,
-        dataRegistroConduta: new Date().toISOString(),
+        conduta: {
+          tipoDesbridamento: anamnesisData.conduta.tipoDesbridamento,
+          solucaoLimpeza: anamnesisData.conduta.solucaoLimpeza,
+          protecaoPerilesao: anamnesisData.conduta.protecaoPerilesao,
+          coberturaPrimaria: anamnesisData.conduta.coberturaPrimaria,
+          coberturaSecundaria: anamnesisData.conduta.coberturaSecundaria,
+          fixacao: anamnesisData.conduta.fixacao,
+          periodoTrocaCobertura: anamnesisData.conduta.periodoTrocaCobertura,
+          usoTerapiaAdjuvante: anamnesisData.conduta.usoTerapiaAdjuvante,
+        },
       };
 
       await axios.put(
@@ -262,7 +275,7 @@ const Prontuario = () => {
 
   return (
     <div>
-      <header>
+      <header style={{ marginBottom: "20px" }}>
         <PatientHeader
           nome={paciente.nomePaciente}
           imagemPerfil={paciente.imagemPerfil}
@@ -270,63 +283,136 @@ const Prontuario = () => {
           calcularIdade={calcularIdade}
         />
       </header>
+      <Divider style={{ marginBottom: "20px" }} />
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={4}>
           <Button
             variant="contained"
-            color="primary"
             onClick={() => setOpenDialog(true)}
+            style={{
+              height: "100%", // Ajusta a altura automaticamente conforme o conteúdo
+              aspectRatio: "1/1", // Garante que o botão seja quadrado
+              display: "flex",
+              flexDirection: "column", // Empilha o texto e o ícone verticalmente
+              justifyContent: "center",
+              alignItems: "center",
+              fontSize: "20px",
+              backgroundColor: "#03BB85",
+            }}
           >
-            {anamnesisExists ? "Revisar Anamnese" : "Fazer Anamnese"}
+            <div>
+              {/* Texto dividido em duas linhas */}
+              <span>{anamnesisExists ? "Refazer" : "Iniciar"}</span>
+              <br></br>
+              <span>Anamnese</span>
+            </div>
+
+            <FaCircleArrowRight
+              style={{ fontSize: "40px", marginTop: "10px" }}
+            />
           </Button>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
-              <Typography variant="h6" className="header" align="center" marginBottom={1}>
+              <Typography
+                variant="h6"
+                className="header"
+                align="center"
+                marginBottom={1}
+              >
                 DADOS GERAIS
               </Typography>
-              <Divider style={{ marginBottom: '16px' }} /> 
+              <Divider style={{ marginBottom: "16px" }} />
               <div className="data">
                 <Grid container spacing={2}>
+                  {/* Campos existentes */}
                   <Grid item xs={6}>
                     <div className="data-item">
-                      <strong>LOCALIZAÇÃO DA LESÃO:</strong> {(anamnesisData.localLesao).toUpperCase()}
+                      <strong>LOCALIZAÇÃO DA LESÃO:</strong>{" "}
+                      {anamnesisData.localLesao.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>ETIOLOGIA DA LESÃO:</strong> {(anamnesisData.etiologia).toUpperCase()}
+                      <strong>ETIOLOGIA DA LESÃO:</strong>{" "}
+                      {anamnesisData.etiologia.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>TAMANHO DA LESÃO:</strong> {(anamnesisData.tamanhoLesao).toUpperCase()}
+                      <strong>TAMANHO DA LESÃO:</strong>{" "}
+                      {anamnesisData.tamanhoLesao.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>PROFUNDIDADE DA LESÃO:</strong> {(anamnesisData.profundidadeLesao).toUpperCase()}
+                      <strong>PROFUNDIDADE DA LESÃO:</strong>{" "}
+                      {anamnesisData.profundidadeLesao.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>BORDAS E MARGENS:</strong> {(anamnesisData.bordasMargens).toUpperCase()}
+                      <strong>BORDAS E MARGENS:</strong>{" "}
+                      {anamnesisData.bordasMargens.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>TIPO DE EXSUDATO:</strong> {(anamnesisData.exsudato).toUpperCase()}
+                      <strong>TIPO DE EXSUDATO:</strong>{" "}
+                      {anamnesisData.exsudato.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>QUANTIDADE DE EXSUDATO:</strong> {(anamnesisData.quantidadeExsudato).toUpperCase()}
+                      <strong>QUANTIDADE DE EXSUDATO:</strong>{" "}
+                      {anamnesisData.quantidadeExsudato.toUpperCase()}
                     </div>
                   </Grid>
                   <Grid item xs={6}>
                     <div className="data-item">
-                    <strong>PERILESÃO:</strong> {(anamnesisData.perilesao).toUpperCase()}
+                      <strong>PERILESÃO:</strong>{" "}
+                      {anamnesisData.perilesao.toUpperCase()}
+                    </div>
+                  </Grid>
+
+                  {/* Novos campos adicionados */}
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>ESPORTISTA:</strong>{" "}
+                      {anamnesisData.esporte ? "SIM" : "NÃO"}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>USO DE MEDICAMENTO:</strong>{" "}
+                      {anamnesisData.medicamento ? "SIM" : "NÃO"}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>ALÉRGICO A ALGUM MEDICAMENTO:</strong>{" "}
+                      {anamnesisData.alergico
+                        ? anamnesisData.alergico.toUpperCase()
+                        : "NÃO"}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>GRÁVIDA:</strong>{" "}
+                      {anamnesisData.gravida ? "SIM" : "NÃO"}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>AMAMENTANDO:</strong>{" "}
+                      {anamnesisData.amamentando ? "SIM" : "NÃO"}
+                    </div>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="data-item">
+                      <strong>FUMANTE:</strong>{" "}
+                      {anamnesisData.fumante ? "SIM" : "NÃO"}
                     </div>
                   </Grid>
                 </Grid>
@@ -336,7 +422,7 @@ const Prontuario = () => {
         </Grid>
       </Grid>
       <Grid container spacing={3} style={{ marginTop: 20 }}>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <PlanosCard
             title="Plano Terapêutico"
             items={planosTerapeuticos}
@@ -344,10 +430,9 @@ const Prontuario = () => {
           />
         </Grid>
 
-        <Grid item xs={6}>
-          <PlanosCard
-            title="Conduta"
-            items={condutas}
+        <Grid item xs={12} sm={6}>
+          <CondutasCard
+            condutas={condutas}
             handleOpenForm={() => setOpenCondutaForm(true)}
           />
         </Grid>
@@ -361,19 +446,102 @@ const Prontuario = () => {
         name="planoTerapeutico"
         label="Plano Terapêutico"
       />
-      <RegistroForm
-        open={openCondutaForm}
-        handleClose={() => setOpenCondutaForm(false)}
-        handleChange={handleChange}
-        handleSave={handleSaveConduta}
-        value={anamnesisData.conduta}
-        name="conduta"
-        label="Conduta"
-      />
+      {/*Atualizar o formulário de conduta*/}
+      <Dialog open={openCondutaForm} onClose={() => setOpenCondutaForm(false)}>
+        <DialogTitle textAlign={"center"}>Registrar Conduta</DialogTitle>
+        <Divider style={{ marginBottom: "14px" }} />
+        <DialogContent>
+          <form noValidate autoComplete="off">
+            <TextField
+              margin="dense"
+              name="tipoDesbridamento"
+              label="Tipo de desbridamento"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.tipoDesbridamento || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="solucaoLimpeza"
+              label="Solução de limpeza"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.solucaoLimpeza || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="protecaoPerilesao"
+              label="Proteção de perilesão"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.protecaoPerilesao || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="coberturaPrimaria"
+              label="Cobertura Primária"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.coberturaPrimaria || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="coberturaSecundaria"
+              label="Cobertura Secundária"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.coberturaSecundaria || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="fixacao"
+              label="Fixação"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.fixacao || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="periodoTrocaCobertura"
+              label="Período de troca da cobertura"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.periodoTrocaCobertura || ""}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="usoTerapiaAdjuvante"
+              label="Uso de terapia adjuvante"
+              type="text"
+              fullWidth
+              value={anamnesisData.conduta?.usoTerapiaAdjuvante || ""}
+              onChange={handleChange}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleSaveConduta}
+            color="primary"
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Salvar"}
+          </Button>
+          <Button onClick={() => setOpenCondutaForm(false)}>Fechar</Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Fazer Anamnese</DialogTitle>
         <DialogContent>
           <form noValidate autoComplete="off">
+            {/* Campos já existentes */}
             <TextField
               margin="dense"
               name="comorbidades"
@@ -381,6 +549,15 @@ const Prontuario = () => {
               type="text"
               fullWidth
               value={anamnesisData.comorbidades}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="localLesao"
+              label="Local da Lesão"
+              type="text"
+              fullWidth
+              value={anamnesisData.localLesao}
               onChange={handleChange}
             />
             <CustomSelect
@@ -417,8 +594,7 @@ const Prontuario = () => {
                 "Profunda com acometimento de tecido adjacentes",
                 "Não classificável",
                 "Acometimentos de estruturas de suporte (tendões, articulações)",
-                "Epitelizada",
-                "Cicatrizada",
+                "Epitelizada, Cicatrizada",
               ]}
               value={anamnesisData.profundidadeLesao}
               handleChange={handleChange}
@@ -428,11 +604,11 @@ const Prontuario = () => {
               label="Tecidos Presentes"
               options={[
                 "Necrose",
-                "NecroseLiquefacao",
+                "Necrose de liquefação",
                 "Esfacelo",
                 "Fibrina",
-                "Granulacao",
-                "Epitelizacao",
+                "Granulação",
+                "Epitelização",
               ]}
               value={anamnesisData.tecidosPresentes}
               handleChange={handleChange}
@@ -445,6 +621,18 @@ const Prontuario = () => {
                 "Não aderidas",
                 "Descoladas",
                 "Com presença de Epitelização",
+                "Regulares",
+                "Plana",
+                "Epibolia",
+                "Macerada",
+                "Epitelizada",
+                "Irregulares",
+                "Descolada",
+                "Fibrótica",
+                "Hiperqueratósica",
+                "Engrossada",
+                "Isquemiada",
+                "Necrosada",
               ]}
               value={anamnesisData.bordasMargens}
               handleChange={handleChange}
@@ -455,27 +643,79 @@ const Prontuario = () => {
               options={[
                 "Seroso",
                 "Serosanguinolento",
+                "Fétido e purulento",
                 "Purulento",
-                "Quantidade",
+                "Sanguinolento",
               ]}
               value={anamnesisData.exsudato}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="quantidadeExsudato"
+              label="Quantidade de Exsudato"
+              options={["Ausente", "Pouco", "Grande", "Escasso", "Moderado"]}
+              value={anamnesisData.quantidadeExsudato}
               handleChange={handleChange}
             />
             <CustomSelect
               name="perilesao"
               label="Perilesão"
               options={[
-                "Eritema",
-                "Edema",
+                "Hiperemiada",
+                "Eczema",
+                "Descamativa",
+                "Edemaciada",
+                "Acrômica",
+                "Dermatite ocre",
                 "Dermatite",
-                "Maceração",
-                "Induração",
-                "Ressecamento",
-                "Descamação",
-                "Sensibilidade",
-                "Ausência de pelos",
+                "Bolhas",
+                "Lipodermatoesclerose",
               ]}
               value={anamnesisData.perilesao}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="esporte"
+              label="Pratica Esporte"
+              options={["Sim", "Não"]}
+              value={anamnesisData.esporte ? "Sim" : "Não"}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="medicamento"
+              label="Uso de Medicamento"
+              options={["Sim", "Não"]}
+              value={anamnesisData.medicamento ? "Sim" : "Não"}
+              handleChange={handleChange}
+            />
+            <TextField
+              margin="dense"
+              name="alergico"
+              label="Alergias"
+              type="text"
+              fullWidth
+              value={anamnesisData.alergico}
+              onChange={handleChange}
+            />
+            <CustomSelect
+              name="gravida"
+              label="Paciente Grávida"
+              options={["Sim", "Não"]}
+              value={anamnesisData.gravida ? "Sim" : "Não"}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="amamentando"
+              label="Paciente Amamentando"
+              options={["Sim", "Não"]}
+              value={anamnesisData.amamentando ? "Sim" : "Não"}
+              handleChange={handleChange}
+            />
+            <CustomSelect
+              name="fumante"
+              label="Paciente Fumante"
+              options={["Sim", "Não"]}
+              value={anamnesisData.fumante ? "Sim" : "Não"}
               handleChange={handleChange}
             />
           </form>

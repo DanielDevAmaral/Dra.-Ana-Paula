@@ -4,12 +4,13 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Lista from './pages/Pacientes/Lista';
 import Prontuario from './pages/Pacientes/Prontuario';
+import './App.css'; // Adicione uma folha de estilo para o app
 
 const App = () => (
   <Router>
     <div className="app">
-      <Sidebar />
-      <main>
+      <Sidebar className="sidebar" />
+      <main className="content">
         <Routes>
           <Route path="/" element={<h2>Bem-vindo à Clínica</h2>} />
           <Route path="/pacientes/lista" element={<Lista />} />

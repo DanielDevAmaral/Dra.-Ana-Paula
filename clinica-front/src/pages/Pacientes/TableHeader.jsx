@@ -16,7 +16,7 @@ const TableHeader = () => (
         <TableCell
           key={header.label}
           sx={{
-            color: "#03BB85",
+            color: "#A77E81",
             fontWeight: "bold",
             textTransform: "uppercase",
             textAlign: header.align,

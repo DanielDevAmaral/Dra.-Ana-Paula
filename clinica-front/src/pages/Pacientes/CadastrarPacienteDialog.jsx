@@ -1,10 +1,11 @@
 import React from "react";
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, CircularProgress } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, CircularProgress, Divider } from "@mui/material";
 import PacienteForm from "./PacienteForm";
 
 const CadastrarPacienteDialog = ({ open, handleClose, handleChange, handleSubmit, loading, newPaciente }) => (
   <Dialog open={open} onClose={handleClose}>
-    <DialogTitle>Cadastrar Paciente</DialogTitle>
+    <DialogTitle textAlign={"center"}>Cadastro de Paciente</DialogTitle>
+    <Divider style={{ marginBottom: "14px" }} />
     <DialogContent>
       <PacienteForm newPaciente={newPaciente} handleChange={handleChange} />
     </DialogContent>

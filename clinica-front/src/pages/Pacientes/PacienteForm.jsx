@@ -134,6 +134,57 @@ const PacienteForm = ({ newPaciente, handleChange }) => {
         value={newPaciente.emailFamiliar}
         onChange={handleChange}
       />
+      {/* New fields */}
+      <FormControl fullWidth margin="dense">
+        <InputLabel>Sexo</InputLabel>
+        <Select
+          name="sexo"
+          value={newPaciente.sexo}
+          onChange={handleChange}
+        >
+          <MenuItem value="Masculino">Masculino</MenuItem>
+          <MenuItem value="Feminino">Feminino</MenuItem>
+          <MenuItem value="Outro">Outro</MenuItem>
+        </Select>
+      </FormControl>
+
+      <TextField
+        label="Profissão"
+        name="profissao"
+        value={newPaciente.profissao}
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+      />
+
+      <TextField
+        label="Peso (kg)"
+        name="peso"
+        type="number"
+        value={newPaciente.peso}
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+      />
+
+      <TextField
+        label="Altura (cm)"
+        name="altura"
+        type="number"
+        value={newPaciente.altura}
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+      />
+
+      <TextField
+        label="Medicações em Uso"
+        name="medicacoesEmUso"
+        value={newPaciente.medicacoesEmUso}
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+      />
     </>
   );
 };

@@ -40,6 +40,11 @@ const Lista = () => {
     nomeFamiliar: "",
     telefoneFamiliar: "",
     emailFamiliar: "",
+    medicacoesEmUso: "",
+    profissao: "",
+    sexo: "",
+    peso: "",
+    altura: "",
   });
 
   useEffect(() => {
@@ -111,7 +116,7 @@ const Lista = () => {
 
   return (
     <>
-      <div style={{ display: "inline-flex", color: "#C8A2C8", alignItems: "center", minWidth: "-webkit-fill-available" }}>
+      <div style={{ display: "inline-flex", color: "#A77E81", alignItems: "center", minWidth: "-webkit-fill-available" }}>
         <TotalPacientes count={count} />
         <CadastrarPacienteButton handleOpen={handleOpen} />
       </div>

@@ -12,11 +12,11 @@ const PatientHeader = ({ nome, imagemPerfil, dataNascimento, calcularIdade }) =>
           sx={{ width: 56, height: 56 }}
         />
       ) : (
-        <AccountCircleIcon sx={{ width: 56, height: 56 }} />
+        <AccountCircleIcon sx={{ width: 56, height: 56, color: "#A77E81" }} />
       )}
     </Grid>
     <Grid item>
-      <Typography variant="h6" fontWeight="bold">
+      <Typography variant="h6" fontWeight="bold" sx={{ color: "#A77E81" }}>
         {nome}
       </Typography>
       <Typography variant="body2">

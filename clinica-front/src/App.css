@@ -1,0 +1,20 @@
+/* App.css */
+.app {
+    display: flex;
+    height: 100vh; /* Ocupar a altura total da tela */
+    overflow: hidden; /* Para evitar scroll horizontal */
+  }
+  
+  .sidebar {
+    flex: 0 0 250px; /* Tamanho fixo da barra lateral */
+    height: 100%;
+    background-color: #fff; /* Exemplo de cor de fundo para a sidebar */
+    color: #fff;
+  }
+  
+  .content {
+    flex: 1; /* O conteúdo ocupará o restante do espaço */
+    overflow-y: auto; /* Permite rolagem vertical se o conteúdo exceder a altura */
+    padding: 20px;
+  }
+  

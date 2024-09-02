@@ -7,10 +7,7 @@ const CadastrarPacienteButton = ({ handleOpen }) => {
   const theme = createTheme({
     palette: {
       purple: {
-        main: "#C8A2C8",
-        light: "#03BB85",
-        dark: "#03BB85",
-        contrastText: "#03BB85",
+        main: "#03BB85",
       },
     },
   });
