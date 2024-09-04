@@ -2,11 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css'; // Import the CSS file
 import { FaLock } from 'react-icons/fa'; // Import lock icon
+import logo from '../imagens/logonobg.png'
 
 const Sidebar = () => (
   <div className="sidebar">
     <div className="logo">
-      <img src={require('D:/Dra. Ana Paula/clinica-front/src/components/imagens/logo sem fundo.png')} alt="Logo" />
+      <img src={logo} alt="Logo" />
     </div>
     <nav>
       <ul>

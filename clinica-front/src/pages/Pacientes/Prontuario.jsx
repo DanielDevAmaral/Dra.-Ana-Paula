@@ -191,15 +191,28 @@ const Prontuario = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setAnamnesisData((prevData) => ({
-      ...prevData,
-      conduta: {
-        ...prevData.conduta,
-        [name]: value,
-      },
-    }));
+  
+    setAnamnesisData((prevData) => {
+      // Verifica se o campo faz parte de `conduta`
+      if (name in prevData.conduta) {
+        return {
+          ...prevData,
+          conduta: {
+            ...prevData.conduta,
+            [name]: value, // Atualiza apenas o campo correspondente em `conduta`
+          },
+        };
+      } else {
+        // Atualiza outros campos fora de `conduta`
+        return {
+          ...prevData,
+          [name]: value,
+        };
+      }
+    });
   };
-
+  
+  
   const handleSavePlano = async () => {
     try {
       const newPlano = {
@@ -232,18 +245,20 @@ const Prontuario = () => {
           usoTerapiaAdjuvante: anamnesisData.conduta.usoTerapiaAdjuvante,
         },
       };
-
-      await axios.put(
+  
+      const response = await axios.put(
         `http://localhost:5000/pacientes/${pacienteId}/conduta`,
         newConduta
       );
-      setCondutas((prevCondutas) => [...prevCondutas, newConduta]);
+  
+      // Atualize o estado com a resposta atualizada do backend
+      setCondutas((prevCondutas) => [...prevCondutas.slice(0, -1), newConduta]);
       setOpenCondutaForm(false);
     } catch (error) {
       console.error("Erro ao salvar conduta:", error);
     }
   };
-
+  
   const handleSubmit = async () => {
     setLoading(true);
     try {

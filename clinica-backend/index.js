@@ -98,7 +98,6 @@ app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
         const { pacienteId } = req.params;
         const { conduta } = req.body;
 
-        // Log para verificar os dados recebidos
         console.log("Dados recebidos:", conduta);
 
         // Encontra o paciente
@@ -110,16 +109,19 @@ app.put('/pacientes/:pacienteId/conduta', async (req, res) => {
             paciente.anamnesis = [];
         }
 
-        // Adiciona um novo objeto de conduta no array anamnesis
-        paciente.anamnesis.push({ conduta });
+        // Sobrescreve a última conduta ou adiciona uma nova se o array estiver vazio
+        if (paciente.anamnesis.length > 0) {
+            paciente.anamnesis[paciente.anamnesis.length - 1] = { conduta }; // Atualiza a última conduta
+        } else {
+            paciente.anamnesis.push({ conduta }); // Adiciona a conduta se o array estiver vazio
+        }
 
-        // Log para verificar o objeto paciente atualizado
-        console.log("Paciente após adicionar conduta:", paciente);
+        console.log("Paciente após atualizar conduta:", paciente);
 
         // Salva o paciente atualizado no banco de dados
         await paciente.save();
 
-        res.status(200).send("Conduta adicionada com sucesso");
+        res.status(200).send("Conduta atualizada com sucesso");
     } catch (error) {
         console.error("Erro ao salvar conduta:", error);
         res.status(500).send("Erro ao salvar conduta");
