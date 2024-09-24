@@ -1,106 +1,80 @@
-// MODELO ANTIGO
-/*
 const mongoose = require('mongoose');
 
-// Definir o esquema do paciente
-const pacienteSchema = new mongoose.Schema({
-  nomePaciente: String,
-  telefonePaciente: String,
-  emailPaciente: String,
-  tipoSanguineo: String,
-  dataNascimento: Date,
-  cpfPaciente: String,
-  enderecoPaciente: String,
-  nomeFamiliar: String,
-  telefoneFamiliar: String,
-  emailFamiliar: String,
-  anamnesis: [{
-      comorbidades: String,
-      localLesao: String,
-      etiologia: String,
-      tamanhoLesao: String,
-      profundidadeLesao: String,
-      bordasMargens: String,
-      exsudato: String,
-      quantidadeExsudato: String,
-      perilesao: String,
-
-      planoTerapeutico: {
-          plano: String,
-          dataRegistroPlano: Date
-      },
-      conduta: {
-          conduta: String,
-          dataRegistroConduta: Date
-      },
-      tecidosPresentes: [String],
-  }]
+const familiaSchema = new mongoose.Schema({
+    nome: {type: String, required: false},
+    numero: {type: String, required: false, unique: true},
+    email: {type: String, required: false},
+    endereco: {type: String, required: false},
+}, {
+    timestamps: true,
 });
 
-const Paciente = mongoose.model('Paciente', pacienteSchema);
+const lesaoSchema = new mongoose.Schema({
+    local: {type: String, required: true},
+    etiologia: {type: String, required: true},
+    tamanho: {type: String, required: true},
+    profundidade: {type: String, required: true},
+    borda: {type: String, required: true},
+    exudato: {type: String, required: true},
+    quantidadeEx: {type: String, required: true},
+    perilesao: {type: String, required: true},
+}, {
+    timestamps: true,
+});
 
-module.exports = Paciente;
-*/
+const condutaSchema = new mongoose.Schema({
+    desbridamento: {type: String, required: true},
+    limpeza: {type: String, required: true}, // Solução de limpeza
+    protecao: {type: String, required: true}, // Proteção de perilesão
+    cobertura: {type: String, required: true}, // Cobertura Primária
+    fixacao: {type: String, required: true},
+    troca: {type: String, required: true}, // Período de troca da cobertura
+    terapia: {type: Boolean, required: true},// Fez uso de terapia adjuvante
+}, {
+    timestamps: true,
+})
 
-// NOVO MODELO ABAIXO
+const anamneseSchema = new mongoose.Schema({
+    comorbidade: {type: String, required: true},
+    lesao: [lesaoSchema],
+    conduta: [condutaSchema],
+    plano: {type: String, required: true},
+    esporte: {type: Boolean, required: true},
+    alergia: {type: [String], required: true},
+    gravidez: {type: Boolean, required: true},
+    amamenta: {type: Boolean, required: true},
+    fumo: {type: Boolean, required: true},
+}, {
+    timestamps: true,
+});
 
-const mongoose = require('mongoose');
-
-// Definir o esquema do paciente
 const pacienteSchema = new mongoose.Schema({
-  nomePaciente: String,
-  telefonePaciente: String,
-  emailPaciente: String,
-  tipoSanguineo: String,
-  dataNascimento: Date,
-  cpfPaciente: String,
-  enderecoPaciente: String,
-  nomeFamiliar: String,
-  telefoneFamiliar: String,
-  emailFamiliar: String,
-  medicacoesEmUso: [String], // Lista de medicações
-  profissao: String,
-  sexo: { type: String, enum: ['Masculino', 'Feminino', 'Outro'] }, // Opções de sexo
-  peso: Number, // Peso do paciente
-  altura: Number, // Altura do paciente
-  anamnesis: [{
-      comorbidades: String,
-      localLesao: String,
-      etiologia: String,
-      tamanhoLesao: String,
-      profundidadeLesao: String,
-      bordasMargens: String,
-      exsudato: String,
-      quantidadeExsudato: String,
-      perilesao: String,
-
-      planoTerapeutico: {
-          plano: String,
-          dataRegistroPlano: Date
-      },
-
-      // Substituição do campo 'conduta' com os novos dados
-      conduta: {
-          tipoDesbridamento: String,    // Tipo de desbridamento
-          solucaoLimpeza: String,       // Solução de limpeza
-          protecaoPerilesao: String,    // Proteção de perilesão
-          coberturaPrimaria: String,    // Cobertura Primária
-          coberturaSecundaria: String,  // Cobertura Secundária
-          fixacao: String,              // Fixação
-          periodoTrocaCobertura: String, // Período de troca da cobertura
-          usoTerapiaAdjuvante: String   // Fez uso de terapia adjuvante
-      },
-
-      tecidosPresentes: [String],
-
-      // Novos campos na anamnese
-      esporte: { type: Boolean }, // Esporte? Sim ou Não
-      medicamento: { type: Boolean }, // Medicamento? Sim ou Não
-      alergico: String, // Descrição de alergias
-      gravida: { type: Boolean }, // Está grávida? Sim ou Não
-      amamentando: { type: Boolean }, // Amamentando? Sim ou Não
-      fumante: { type: Boolean } // Fumante? Sim ou Não
-  }]
+  nome: {type: String, required: true},
+  numero: {type: String, required: true, unique: true},
+  email: {type: String, required: true},
+  nascimento: {type: Date, required: true},
+  cpf: {type: String, required: true},
+  endereco: {type: String, required: true},
+  sexo: {type: String, required: true},
+  medicamentos: {type: [String], required: false},
+  peso: {type: Number, required: true, default: 0.0}, 
+  altura: {type: Number, required: true, default: 0.0},
+  profissao: {type: String, required: true},
+  familia: [familiaSchema],
+  anamnese: {
+    type: [anamneseSchema],
+    default: [],
+  },
+  agenda:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Agenda'
+  },
+  financeiro: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Financeiro'
+  }
+}, {
+    timestamps: true,
 });
 
 const Paciente = mongoose.model('Paciente', pacienteSchema);
