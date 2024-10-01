@@ -1,22 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('../middleware/asyncHandler.js');
-const Paciente = require('../models/Paciente.js')
+const {getPacientes, getPacientesById} = require('../controllers/pacienteController')
 
-router.get('/', asyncHandler(async (req, res) => {
-    const pacientes = await Paciente.find({});
-    res.json(pacientes);
-}));
-
-router.get('/:id', asyncHandler(async (req, res) => {
-    const paciente = await Paciente.findById(req.params.id);
-    
-    if (paciente) {
-       return res.json(paciente);
-    }
-
-    res.status(404).json({message: 'Paciente não encontrado'});
-    
-}));
+router.route('/').get(getPacientes);
+router.route('/:id').get(getPacientesById);
 
 module.exports = router;
