@@ -1,8 +1,11 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import './Sidebar.css'; // Import the CSS file
-import { FaLock } from 'react-icons/fa'; // Import lock icon
-import logo from '../imagens/logonobg.png'
+import { NavLink } from "react-router-dom";
+import { FaLock } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import React from "react";
+import logo from "../imagens/logonobg.png";
+import "./Sidebar.css";
+
+const lockIcon = <FaLock />;
 
 const Sidebar = () => (
   <div className="sidebar">
@@ -11,32 +14,17 @@ const Sidebar = () => (
     </div>
     <nav>
       <ul>
-        {/* Disabled Link for Agenda */}
         <li className="disabled">
-          <span>Agenda <FaLock /></span>
+          <Link to={`/agenda`}><span>Agenda {lockIcon}</span></Link>
         </li>
-        {/* Disabled Link for Financeiro */}
         <li className="disabled">
-          <span>Financeiro <FaLock /></span>
+        <Link to={`/financeiro`}><span>Financeiro {lockIcon}</span></Link>
         </li>
-        {/* Pacientes Menu */}
         <li className="pacientes">
-          <NavLink to="/pacientes/lista" activeclassname="active">Pacientes</NavLink>
-          <ul className="sub-menu">
-            <li><NavLink to="/pacientes/lista" activeclassname="active">Lista</NavLink></li>
-            {/* Disabled Link for Aniversariantes */}
-            <li className="disabled">
-              <span>Aniversariantes <FaLock /></span>
-            </li>
-            {/* Disabled Link for Relatórios */}
-            <li className="disabled">
-              <span>Relatórios <FaLock /></span>
-            </li>
-          </ul>
+        <Link to={`/pacientes`}><span>Pacientes</span></Link>
         </li>
-        {/* Disabled Link for Materiais */}
         <li className="disabled">
-          <span>Materiais <FaLock /></span>
+        <Link to={`/material`}><span>Materiais {lockIcon}</span></Link>
         </li>
       </ul>
     </nav>
