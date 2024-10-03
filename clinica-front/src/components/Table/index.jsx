@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 export default function TableComponent({ columns, rows, onDelete }) {
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{borderRadius: "34px",  maxHeight: "600px", overflowY: "auto"}}>
       <Table>
         <TableHead>
           <TableRow>
