@@ -1,0 +1,17 @@
+.header-pacientes{
+    display: flex;
+    margin-bottom: 14px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-pacientes-count{
+    background-color: white;
+    padding: 6px 16px;
+    border-radius: 34px;
+    color:#A77E81;
+}
+
+.header-pacientes-count p{
+    display: contents;
+}
