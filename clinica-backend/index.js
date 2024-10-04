@@ -15,8 +15,7 @@ app.use(cors({
     origin: '*'
 }));
 app.use(morgan('dev'));
-
-
+app.use(express.json());
 
 // Rota para obter a lista de pacientes
 app.get('/', async (req, res) => {

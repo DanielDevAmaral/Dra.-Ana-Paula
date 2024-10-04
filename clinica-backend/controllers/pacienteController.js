@@ -18,9 +18,10 @@ const getPacientes = asyncHandler(async (req, res) => {
 // @route POST /api/pacientes
 // @access public
 const cadastrarPaciente = asyncHandler(async (req, res) => {
-    console.log("iniciado o processo de cadastro")
-      // Extraindo os campos do corpo da requisição
-      const {
+    console.log("iniciado o processo de cadastro");
+
+    // Extraindo os campos do corpo da requisição
+    const {
         nome,
         numero,
         email,
@@ -35,7 +36,21 @@ const cadastrarPaciente = asyncHandler(async (req, res) => {
         familia // deve ser um array de objetos que respeitam o familiaSchema
     } = req.body;
 
-    console.log(`recebido o nome: ${nome}`)
+    console.log(`recebido o nome: ${nome}`);
+
+    // Verificando se o CPF já está cadastrado
+    const pacienteExistente = await Paciente.findOne({ cpf });
+    if (pacienteExistente) {
+        res.status(400);
+        throw new Error('Já existe um paciente cadastrado com este CPF');
+    }
+
+    // Validação dos campos obrigatórios
+    if (!nome || !numero || !email || !cpf || !profissao || !nascimento || !sexo) {
+        res.status(400);
+        throw new Error('Todos os campos obrigatórios devem ser preenchidos');
+    }
+
     // Cria um novo paciente com os campos extraídos
     const novoPaciente = new Paciente({
         nome,
@@ -52,13 +67,14 @@ const cadastrarPaciente = asyncHandler(async (req, res) => {
         familia // diretamente passamos o array de familia
     });
 
-    try {
-        const pacienteSalvo = await novoPaciente.save();
-        res.status(201).json(pacienteSalvo);
-    } catch (error) {
-        res.status(500);
-        throw new Error('Não foi possivel cadastrar o paciente');
-    }
+    // Salvando o paciente no banco de dados
+    const pacienteSalvo = await novoPaciente.save();
+
+    // Enviando sinal para o terminal
+    console.log("Paciente adicionado com sucesso")
+
+    // Retorna o paciente cadastrado com sucesso
+    res.status(201).json(pacienteSalvo);
 });
 
 // @desc Fetch Paciente by Id
@@ -74,4 +90,19 @@ const getPacientesById = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { getPacientes, getPacientesById, cadastrarPaciente };
+// @desc Remover Paciente by Id
+// @route DELETE /api/pacientes/:id
+// @access public
+const removerPacienteById = asyncHandler(async (req, res) => {
+    const paciente = await Paciente.findById(req.params.id);
+    
+    if (!paciente) {
+        res.status(404);
+        throw new Error('Paciente não encontrado');
+    }
+
+    await paciente.deleteOne();
+    res.json({ message: 'Paciente removido com sucesso' });
+});
+
+module.exports = { getPacientes, getPacientesById, cadastrarPaciente, removerPacienteById };

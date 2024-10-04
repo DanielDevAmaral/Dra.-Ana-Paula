@@ -10,6 +10,7 @@ import {
   InputLabel,
   IconButton,
 } from "@mui/material";
+import InputMask from "react-input-mask";
 import { Add } from "@mui/icons-material";
 import axios from "axios";
 import "./FormPaciente.css";
@@ -24,11 +25,11 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
-  borderRadius: '34px',
+  borderRadius: "34px",
   overflowY: "auto", // Adiciona uma barra de rolagem
 };
 
-const FormModal = ({ open, handleClose }) => {
+const FormModal = ({ open, handleClose, handleSubmit }) => {
   const [formData, setFormData] = useState({
     nome: "",
     numero: "",
@@ -78,22 +79,17 @@ const FormModal = ({ open, handleClose }) => {
     });
   };
 
-  const handleSubmit = async (e) => {
+  // Ao submeter o formulário, a função handleSubmit passada como prop será chamada
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:8000/api/pacientes", formData);
-      console.log("Paciente salvo com sucesso:", response.data);
-      handleClose();
-    } catch (error) {
-      console.error("Erro ao salvar paciente:", error);
-    }
+    handleSubmit(formData); // Passa o formData para a função handleSubmit do componente pai
   };
 
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
         <h2>Cadastro de Paciente</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <TextField
             label="Nome"
             name="nome"
@@ -103,15 +99,23 @@ const FormModal = ({ open, handleClose }) => {
             margin="normal"
             required
           />
-          <TextField
-            label="Número de Telefone"
-            name="numero"
+          <InputMask
+            mask="(99) 99999-9999" // Máscara para número de telefone no formato brasileiro
             value={formData.numero}
             onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
+          >
+          {() => (
+            <TextField
+              label="Número de Telefone"
+              name="numero"
+              value={formData.numero}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              required
+            />
+          )}
+          </InputMask>
           <TextField
             label="Email"
             name="email"
@@ -132,7 +136,12 @@ const FormModal = ({ open, handleClose }) => {
             InputLabelProps={{ shrink: true }}
             required
           />
-          <TextField
+          <InputMask
+            mask="999.999.999-99" // Máscara para número de telefone no formato brasileiro
+            value={formData.cpf}
+            onChange={handleChange}
+          >
+          {() => (<TextField
             label="CPF"
             name="cpf"
             value={formData.cpf}
@@ -140,7 +149,8 @@ const FormModal = ({ open, handleClose }) => {
             fullWidth
             margin="normal"
             required
-          />
+          />)}
+          </InputMask>
           <TextField
             label="Endereço"
             name="endereco"
@@ -185,6 +195,7 @@ const FormModal = ({ open, handleClose }) => {
             margin="normal"
             required
           />
+
           <TextField
             label="Altura"
             name="altura"
