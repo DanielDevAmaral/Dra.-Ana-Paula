@@ -39,7 +39,7 @@ const Pacientes = () => {
     const fetchPacientes = async () => {
       try {
         // Requisição à API para obter os pacientes
-        const { data } = await axios.get("http://localhost:8000/api/pacientes");
+        const { data } = await axios.get("https://ana-paula-backend.onrender.com/api/pacientes");
 
         // Mapeando os dados recebidos para o formato esperado pelas linhas da tabela
         const formattedData = data.map((paciente) => ({
@@ -73,7 +73,7 @@ const handleDelete = async (paciente) => {
     if (result.isConfirmed) {
       try {
         // Faz a requisição DELETE para a API
-        await axios.delete(`http://localhost:8000/api/pacientes/${pacienteID}`);
+        await axios.delete(`https://ana-paula-backend.onrender.com/api/pacientes/${pacienteID}`);
         
         // Atualiza a lista local de pacientes, removendo o paciente deletado
         setPacientes(pacientes.filter((p) => p.id !== pacienteID));
