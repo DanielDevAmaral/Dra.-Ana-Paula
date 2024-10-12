@@ -4,7 +4,7 @@ import { Add } from '@mui/icons-material';
 import FormPaciente from '../FormPaciente';
 import './AddPaciente.css'
 
-const AddPaciente = () => {
+const AddPaciente = ({ handleSubmit }) => {
   const [open, setOpen] = useState(false); // Controle do estado do modal
 
   const handleOpen = () => {
@@ -39,8 +39,7 @@ const AddPaciente = () => {
         <p className='butt-add-paciente'>Adicionar Paciente</p>
       </Button>
 
-      {/* Modal que contém o formulário */}
-      <FormPaciente open={open} handleClose={handleClose} />
+      <FormPaciente open={open} handleClose={handleClose} handleSubmit={handleSubmit} />
     </div>
   );
 };

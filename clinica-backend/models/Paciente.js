@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const familiaSchema = new mongoose.Schema({
     nome: {type: String, required: false},
-    numero: {type: String, required: false, unique: true},
+    numero: {type: String, required: false},
     email: {type: String, required: false},
     endereco: {type: String, required: false},
 }, {

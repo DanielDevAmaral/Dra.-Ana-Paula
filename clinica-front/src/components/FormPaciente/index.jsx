@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import InputMask from "react-input-mask";
 import { Add } from "@mui/icons-material";
-import axios from "axios";
 import "./FormPaciente.css";
 
 const style = {
@@ -168,8 +167,9 @@ const FormModal = ({ open, handleClose, handleSubmit }) => {
               onChange={handleChange}
               label="Sexo"
             >
-              <MenuItem value="masculino">Masculino</MenuItem>
-              <MenuItem value="feminino">Feminino</MenuItem>
+              <MenuItem value="Masculino">Masculino</MenuItem>
+              <MenuItem value="Feminino">Feminino</MenuItem>
+              <MenuItem value="Outros">Outros</MenuItem>
             </Select>
           </FormControl>
           {formData.medicamentos.map((medicamento, index) => (

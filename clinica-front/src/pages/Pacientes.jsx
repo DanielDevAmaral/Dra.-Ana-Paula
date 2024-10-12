@@ -17,29 +17,36 @@ const Pacientes = () => {
   const [pacientes, setPacientes] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false); // modal refere-se ao formulário de criação de paciente
   
-  // Função handleSubmit no componente principal
-  const handleSubmitForm = async (formData) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/api/pacientes",
-        formData
-      );
-      console.log("Paciente salvo com sucesso:", response.data);
-      setModalOpen(false); // Fechar o modal após o sucesso
-      setPacientes(...pacientes, response.data)
-    } catch (error) {
-      console.error("Erro ao salvar paciente:", error);
-    }
-  };
+// Função handleSubmit no componente principal
+const handleSubmitForm = async (formData) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/pacientes",
+      formData
+    );
+    console.log("Paciente salvo com sucesso:", response.data);
+    setPacientes((prevPacientes) => [...prevPacientes, response.data]);
+    setModalOpen(false); // Fechar o modal após o sucesso
+  } catch (error) {
+    console.error("Erro ao salvar paciente:", error);
+    Swal.fire({
+      title: "Erro!",
+      text: "Não foi possível registrar o paciente.",
+      icon: "error",
+      confirmButtonColor: "#945E62",
+    }).then(() => {
+      setModalOpen(false); // Fechar o modal após exibir o SweetAlert
+    });
+  }
+};
 
-  const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
 
   useEffect(() => {
     const fetchPacientes = async () => {
       try {
         // Requisição à API para obter os pacientes
-        const { data } = await axios.get("https://ana-paula-backend.onrender.com/api/pacientes");
+        const { data } = await axios.get("http://localhost:8000/api/pacientes");
 
         // Mapeando os dados recebidos para o formato esperado pelas linhas da tabela
         const formattedData = data.map((paciente) => ({
@@ -73,10 +80,10 @@ const handleDelete = async (paciente) => {
     if (result.isConfirmed) {
       try {
         // Faz a requisição DELETE para a API
-        await axios.delete(`https://ana-paula-backend.onrender.com/api/pacientes/${pacienteID}`);
+        await axios.delete(`http://localhost:8000/api/pacientes/${paciente.id}`);
         
         // Atualiza a lista local de pacientes, removendo o paciente deletado
-        setPacientes(pacientes.filter((p) => p.id !== pacienteID));
+        setPacientes(pacientes.filter((p) => p.id !== paciente.id));
         
         // Exibe a confirmação de exclusão
         Swal.fire({
@@ -108,7 +115,7 @@ const handleDelete = async (paciente) => {
           Número de pacientes: {countPacientes}
         </p>
         </div>
-        <AddPaciente />
+        <AddPaciente handleSubmit={handleSubmitForm} />
       </div>
       <TableComponent
         columns={columns}
