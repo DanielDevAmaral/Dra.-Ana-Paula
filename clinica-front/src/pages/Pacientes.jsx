@@ -22,18 +22,31 @@ const handleSubmitForm = async (formData) => {
   try {
     const response = await axios.post(
       "http://localhost:8000/api/pacientes",
-      formData
+      formData,
+      { validateStatus: (status) => status >= 200 && status < 300 }
     );
     console.log("Paciente salvo com sucesso:", response.data);
     setPacientes((prevPacientes) => [...prevPacientes, response.data]);
     setModalOpen(false); // Fechar o modal após o sucesso
+    Swal.fire({
+      title: "Paciente adicionado",
+      text: `${response.data.nome} foi adicionado com sucesso a sua lista de pacientes 🥳`,
+      icon: "success",
+      confirmButtonColor: "#945E62"
+    })
   } catch (error) {
     console.error("Erro ao salvar paciente:", error);
+    let errorMessage = "Não foi possível registrar o paciente 🕵️"
+
+    if(error.response && error.response.data && error.response.data.message){
+      errorMessage = error.response.data.message;
+    };
+
     Swal.fire({
-      title: "Erro!",
-      text: "Não foi possível registrar o paciente.",
+      title: "Erro ao adicionar Paciente!",
+      text: errorMessage,
       icon: "error",
-      confirmButtonColor: "#945E62",
+      confirmButtonColor: "#945E62"
     }).then(() => {
       setModalOpen(false); // Fechar o modal após exibir o SweetAlert
     });
@@ -115,16 +128,14 @@ const handleDelete = async (paciente) => {
           Número de pacientes: {countPacientes}
         </p>
         </div>
-        <AddPaciente handleSubmit={handleSubmitForm} />
+        {/*os parametros "open" e "handleClose" são passados para AddPaciente que passam para FormPaciente*/}
+        <AddPaciente handleSubmit={handleSubmitForm} open={isModalOpen} setModalOpen={setModalOpen} handleClose={handleCloseModal}/>
       </div>
       <TableComponent
         columns={columns}
         rows={pacientes}
         onDelete={handleDelete}
         id={pacientes.id}
-        handleSubmit={handleSubmitForm}
-        open={isModalOpen}
-        handleClose={handleCloseModal}
       />
     </div>
   );

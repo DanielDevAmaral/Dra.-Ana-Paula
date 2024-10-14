@@ -6,26 +6,61 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import MedicalIcon from '@mui/icons-material/Assignment'; // Ícone da ficha médica
-import DeleteIcon from '@mui/icons-material/Delete'; // Ícone da lixeira
-import IconButton from '@mui/material/IconButton'; // Botão para ícones
+import MedicalIcon from '@mui/icons-material/Assignment';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
 import { Link } from "react-router-dom";
 
-// Componente TableComponent que aceita 'columns', 'rows' e 'onDelete' como props
 export default function TableComponent({ columns, rows, onDelete }) {
 
   return (
-    <TableContainer component={Paper} sx={{borderRadius: "34px",  maxHeight: "600px", overflowY: "auto", boxShadow: "none"}}>
-      <Table>
+    <TableContainer 
+      component={Paper} 
+      sx={{
+        borderRadius: "34px", 
+        maxHeight: "500px", 
+        overflowY: "auto", 
+        boxShadow: "none"
+      }}
+    >
+      <Table stickyHeader> {/* Enable stickyHeader for fixed headers */}
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell key={column.field} align={column.align || 'center'}>
+              <TableCell
+                key={column.field}
+                align={column.align || 'center'}
+                sx={{
+                  position: 'sticky', // Fix the position of header cells
+                  top: 0, // Ensure the headers stick to the top
+                  backgroundColor: '#fff', // Set background color so it remains visible when scrolling
+                  zIndex: 1, // Ensures headers are on top of other elements
+                  borderBottom: '2px solid #ddd', // Optional: Add bottom border for better visibility
+                }}
+              >
                 {column.headerName}
               </TableCell>
             ))}
-            <TableCell align="center"></TableCell> {/* Coluna da ficha médica */}
-            <TableCell align="center"></TableCell> {/* Coluna da lixeira */}
+            <TableCell 
+              align="center"
+              sx={{
+                position: 'sticky',
+                top: 0,
+                backgroundColor: '#fff',
+                zIndex: 1,
+                borderBottom: '2px solid #ddd',
+              }}
+            ></TableCell>
+            <TableCell 
+              align="center"
+              sx={{
+                position: 'sticky',
+                top: 0,
+                backgroundColor: '#fff',
+                zIndex: 1,
+                borderBottom: '2px solid #ddd',
+              }}
+            ></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -36,15 +71,13 @@ export default function TableComponent({ columns, rows, onDelete }) {
                   {row[column.field]}
                 </TableCell>
               ))}
-              {/* Coluna do ícone da ficha médica */}
               <TableCell align="center">
                 <Link to={`/pacientes/${row.id}`}>
-                <IconButton>
-                  <MedicalIcon />
-                </IconButton>
+                  <IconButton>
+                    <MedicalIcon />
+                  </IconButton>
                 </Link>
               </TableCell>
-              {/* Coluna do ícone de lixeira */}
               <TableCell align="center">
                 <IconButton onClick={() => onDelete(row)}>
                   <DeleteIcon color="error" />

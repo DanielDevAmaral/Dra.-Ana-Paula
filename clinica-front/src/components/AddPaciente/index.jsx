@@ -1,26 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, IconButton } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import FormPaciente from '../FormPaciente';
 import './AddPaciente.css'
 
-const AddPaciente = ({ handleSubmit }) => {
-  const [open, setOpen] = useState(false); // Controle do estado do modal
-
-  const handleOpen = () => {
-    setOpen(true); // Abre o modal ao clicar no botão
-  };
-
-  const handleClose = () => {
-    setOpen(false); // Fecha o modal
-  };
-
+const AddPaciente = ({ handleSubmit, open, setModalOpen, handleClose }) => {
   return (
     <div>
       <Button
         variant="contained"
         color="primary"
-        onClick={handleOpen}
+        onClick={() => setModalOpen(true)} // Usa a função passada do componente principal
         startIcon={
           <IconButton>
             <Add sx={{ color: '#fff' }} /> {/* Ícone de + estilizado */}

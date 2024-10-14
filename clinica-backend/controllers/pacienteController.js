@@ -42,13 +42,19 @@ const cadastrarPaciente = asyncHandler(async (req, res) => {
     const pacienteExistente = await Paciente.findOne({ cpf });
     if (pacienteExistente) {
         res.status(400);
-        throw new Error('Já existe um paciente cadastrado com este CPF');
+        throw new Error('Já existe um paciente cadastrado com esse CPF, por favor mude o CPF 🔎');
+    }
+
+    const numeroExistente = await Paciente.findOne({ numero });
+    if (numeroExistente) {
+        res.status(400);
+        throw new Error('Já existe um paciente cadastrado com esse número de Telefone, por favor mude o número 🔎');
     }
 
     // Validação dos campos obrigatórios
     if (!nome || !numero || !email || !cpf || !profissao || !nascimento || !sexo) {
         res.status(400);
-        throw new Error('Todos os campos obrigatórios devem ser preenchidos');
+        throw new Error('Preencha todos os campos obrigatórios com informações do Paciente 🔎');
     }
 
     // Cria um novo paciente com os campos extraídos
@@ -74,7 +80,7 @@ const cadastrarPaciente = asyncHandler(async (req, res) => {
     console.log("Paciente adicionado com sucesso")
 
     // Retorna o paciente cadastrado com sucesso
-    res.status(201).json(pacienteSalvo);
+    res.status(200).json(pacienteSalvo);
 });
 
 // @desc Fetch Paciente by Id
