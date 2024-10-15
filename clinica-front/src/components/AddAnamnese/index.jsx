@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button, IconButton } from '@mui/material';
 import { Add } from '@mui/icons-material';
-import FormPaciente from '../FormPaciente';
-import './AddPaciente.css'
+import FormAnamnese from '../FormAnamnese';
+import './AddAnamnese.css'
 
-const AddPaciente = ({ handleSubmit, open, setModalOpen, handleClose }) => {
+const AddAnamnese = ({ handleSubmit, open, setModalOpen, handleClose }) => {
   return (
     <div>
       <Button
@@ -29,9 +29,9 @@ const AddPaciente = ({ handleSubmit, open, setModalOpen, handleClose }) => {
         <p className='butt-add-paciente'>Registrar Anamnese</p>
       </Button>
 
-      <FormPaciente open={open} handleClose={handleClose} handleSubmit={handleSubmit} />
+      <FormAnamnese open={open} handleClose={handleClose} handleSubmit={handleSubmit} />
     </div>
   );
 };
 
-export default AddPaciente;
+export default AddAnamnese;

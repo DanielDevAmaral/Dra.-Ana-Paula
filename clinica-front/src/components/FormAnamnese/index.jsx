@@ -9,8 +9,9 @@ import {
   FormControl,
   InputLabel,
   IconButton,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
-import InputMask from "react-input-mask";
 import { Add } from "@mui/icons-material";
 import "./FormAnamnese.css";
 
@@ -20,65 +21,48 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 900,
-  height: "80vh", // Define uma altura fixa para o modal
+  height: "80vh",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
   borderRadius: "34px",
-  overflowY: "auto", // Adiciona uma barra de rolagem
+  overflowY: "auto",
 };
 
 const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
   const [formData, setFormData] = useState({
     comorbidade: "",
     lesao: [{ local: "", etiologia: "", tamanho: "", profundidade: "", borda: "", exudato: "", quantidadeEx: "", perilesao: "" }],
-    conduta: [{ desbridamento: "", limpeza: "", protecao: "", cobertura: "", fixacao: "", troca: "", terapia: ""}],
+    conduta: [{ desbridamento: "", limpeza: "", protecao: "", cobertura: "", fixacao: "", troca: "", terapia: false }],
     plano: "",
-    esporte: "",
+    esporte: false,
     alergia: [""],
-    gravidez: "",
-    amamenta: "",
-    fumo: ""
+    gravidez: false,
+    amamenta: false,
+    fumo: false,
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  const handleMedicamentoChange = (index, value) => {
-    const newMedicamentos = [...formData.medicamentos];
-    newMedicamentos[index] = value;
-    setFormData({ ...formData, medicamentos: newMedicamentos });
+  const handleArrayChange = (index, field, value, arrayName) => {
+    const newArray = [...formData[arrayName]];
+    newArray[index][field] = value;
+    setFormData({ ...formData, [arrayName]: newArray });
   };
 
-  const handleFamiliaChange = (index, field, value) => {
-    const newFamilia = [...formData.familia];
-    newFamilia[index][field] = value;
-    setFormData({ ...formData, familia: newFamilia });
+  const addArrayItem = (arrayName, newItem) => {
+    setFormData({ ...formData, [arrayName]: [...formData[arrayName], newItem] });
   };
 
-  const addMedicamento = () => {
-    setFormData({ ...formData, medicamentos: [...formData.medicamentos, ""] });
-  };
-
-  const addFamilia = () => {
-    setFormData({
-      ...formData,
-      familia: [
-        ...formData.familia,
-        { nome: "", numero: "", email: "", endereco: "" },
-      ],
-    });
-  };
-
-  // Ao submeter o formulário, a função handleSubmit passada como prop será chamada
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    handleSubmit(formData); // Passa o formData para a função handleSubmit do componente pai
+    handleSubmit(formData);
   };
 
   return (
@@ -86,175 +70,132 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
       <Box sx={style}>
         <h2>Registrar Anamnese</h2>
         <form onSubmit={handleFormSubmit}>
+          {/* Comorbidade */}
           <TextField
-            label="Nome"
-            name="nome"
-            value={formData.nome}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <InputMask
-            mask="(99) 99999-9999" // Máscara para número de telefone no formato brasileiro
-            value={formData.numero}
-            onChange={handleChange}
-          >
-          {() => (
-            <TextField
-              label="Número de Telefone"
-              name="numero"
-              value={formData.numero}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-            />
-          )}
-          </InputMask>
-          <TextField
-            label="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Data de Nascimento"
-            name="nascimento"
-            type="date"
-            value={formData.nascimento}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            InputLabelProps={{ shrink: true }}
-            required
-          />
-          <InputMask
-            mask="999.999.999-99" // Máscara para número de telefone no formato brasileiro
-            value={formData.cpf}
-            onChange={handleChange}
-          >
-          {() => (<TextField
-            label="CPF"
-            name="cpf"
-            value={formData.cpf}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />)}
-          </InputMask>
-          <TextField
-            label="Endereço"
-            name="endereco"
-            value={formData.endereco}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel>Sexo</InputLabel>
-            <Select
-              name="sexo"
-              value={formData.sexo}
-              onChange={handleChange}
-              label="Sexo"
-            >
-              <MenuItem value="Masculino">Masculino</MenuItem>
-              <MenuItem value="Feminino">Feminino</MenuItem>
-              <MenuItem value="Outros">Outros</MenuItem>
-            </Select>
-          </FormControl>
-          {formData.medicamentos.map((medicamento, index) => (
-            <TextField
-              key={index}
-              label={`Medicamento ${index + 1}`}
-              value={medicamento}
-              onChange={(e) => handleMedicamentoChange(index, e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-          ))}
-          <IconButton onClick={addMedicamento}>
-            <Add /> Adicionar Medicamento
-          </IconButton>
-          <TextField
-            label="Peso"
-            name="peso"
-            type="number"
-            value={formData.peso}
+            label="Comorbidade"
+            name="comorbidade"
+            value={formData.comorbidade}
             onChange={handleChange}
             fullWidth
             margin="normal"
             required
           />
 
-          <TextField
-            label="Altura"
-            name="altura"
-            type="number"
-            value={formData.altura}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Profissão"
-            name="profissao"
-            value={formData.profissao}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          {formData.familia.map((membro, index) => (
+          {/* Lesões */}
+          {formData.lesao.map((lesao, index) => (
             <div key={index}>
               <TextField
-                label="Nome do Familiar"
-                value={membro.nome}
-                onChange={(e) =>
-                  handleFamiliaChange(index, "nome", e.target.value)
-                }
+                label={`Local da Lesão ${index + 1}`}
+                value={lesao.local}
+                onChange={(e) => handleArrayChange(index, "local", e.target.value, "lesao")}
                 fullWidth
                 margin="normal"
+                required
               />
               <TextField
-                label="Número do Familiar"
-                value={membro.numero}
-                onChange={(e) =>
-                  handleFamiliaChange(index, "numero", e.target.value)
-                }
+                label="Etiologia"
+                value={lesao.etiologia}
+                onChange={(e) => handleArrayChange(index, "etiologia", e.target.value, "lesao")}
                 fullWidth
                 margin="normal"
+                required
               />
               <TextField
-                label="Email do Familiar"
-                value={membro.email}
-                onChange={(e) =>
-                  handleFamiliaChange(index, "email", e.target.value)
-                }
+                label="Tamanho"
+                value={lesao.tamanho}
+                onChange={(e) => handleArrayChange(index, "tamanho", e.target.value, "lesao")}
                 fullWidth
                 margin="normal"
+                required
               />
               <TextField
-                label="Endereço do Familiar"
-                value={membro.endereco}
-                onChange={(e) =>
-                  handleFamiliaChange(index, "endereco", e.target.value)
-                }
+                label="Profundidade"
+                value={lesao.profundidade}
+                onChange={(e) => handleArrayChange(index, "profundidade", e.target.value, "lesao")}
                 fullWidth
                 margin="normal"
+                required
               />
+              {/* Outros campos */}
+              {/* Botão para adicionar nova lesão */}
+              <IconButton onClick={() => addArrayItem("lesao", { local: "", etiologia: "", tamanho: "", profundidade: "", borda: "", exudato: "", quantidadeEx: "", perilesao: "" })}>
+                <Add /> Adicionar Lesão
+              </IconButton>
             </div>
           ))}
-          <IconButton onClick={addFamilia}>
-            <Add /> Adicionar Membro da Família
+
+          {/* Condutas */}
+          {formData.conduta.map((conduta, index) => (
+            <div key={index}>
+              <TextField
+                label={`Desbridamento ${index + 1}`}
+                value={conduta.desbridamento}
+                onChange={(e) => handleArrayChange(index, "desbridamento", e.target.value, "conduta")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Limpeza"
+                value={conduta.limpeza}
+                onChange={(e) => handleArrayChange(index, "limpeza", e.target.value, "conduta")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <FormControlLabel
+                control={<Checkbox checked={conduta.terapia} onChange={(e) => handleArrayChange(index, "terapia", e.target.checked, "conduta")} />}
+                label="Terapia Adjuvante"
+              />
+              {/* Botão para adicionar nova conduta */}
+              <IconButton onClick={() => addArrayItem("conduta", { desbridamento: "", limpeza: "", protecao: "", cobertura: "", fixacao: "", troca: "", terapia: false })}>
+                <Add /> Adicionar Conduta
+              </IconButton>
+            </div>
+          ))}
+
+          {/* Outros campos */}
+          <TextField
+            label="Plano"
+            name="plano"
+            value={formData.plano}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.esporte} onChange={handleChange} name="esporte" />}
+            label="Pratica Esporte"
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.gravidez} onChange={handleChange} name="gravidez" />}
+            label="Está Grávida"
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.amamenta} onChange={handleChange} name="amamenta" />}
+            label="Amamenta"
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.fumo} onChange={handleChange} name="fumo" />}
+            label="Fuma"
+          />
+
+          {/* Alergias */}
+          {formData.alergia.map((alergia, index) => (
+            <TextField
+              key={index}
+              label={`Alergia ${index + 1}`}
+              value={alergia}
+              onChange={(e) => handleArrayChange(index, "", e.target.value, "alergia")}
+              fullWidth
+              margin="normal"
+            />
+          ))}
+          <IconButton onClick={() => addArrayItem("alergia", "")}>
+            <Add /> Adicionar Alergia
           </IconButton>
+
           <Button
             type="submit"
             variant="contained"
@@ -262,14 +203,11 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
             sx={{
               mt: 2,
               borderRadius: "34px",
-              backgroundColor: "#A77E81", // Cor de fundo personalizada
-              "&:hover": {
-                backgroundColor: "#945E62", // Cor ao passar o mouse
-              },
+              backgroundColor: "#A77E81",
+              "&:hover": { backgroundColor: "#945E62" },
             }}
-            onClick={handleSubmit}
           >
-            Salvar Paciente
+            Salvar Anamnese
           </Button>
         </form>
       </Box>
