@@ -56,6 +56,13 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
     setFormData({ ...formData, [arrayName]: newArray });
   };
 
+  const handleAlergiaChange = (index, value) => {
+    const newalergia = [...formData.alergia];
+    newalergia[index] = value;
+    setFormData({ ...formData, alergia: newalergia });
+  };
+
+
   const addArrayItem = (arrayName, newItem) => {
     setFormData({ ...formData, [arrayName]: [...formData[arrayName], newItem] });
   };
@@ -187,7 +194,7 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
               key={index}
               label={`Alergia ${index + 1}`}
               value={alergia}
-              onChange={(e) => handleArrayChange(index, "", e.target.value, "alergia")}
+              onChange={(e) => handleAlergiaChange(index, e.target.value)}
               fullWidth
               margin="normal"
             />

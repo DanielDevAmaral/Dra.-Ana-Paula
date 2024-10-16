@@ -5,6 +5,7 @@ dotenv.config();
 const connectDB = require('./config/db');
 const morgan = require('morgan');
 const pacienteRoutes = require('./routes/pacientesRoutes')
+const anamneseRoutes = require('./routes/anamneseRoutes')
 const {notFound, errorHandler} = require('./middleware/errorMiddleware');
 
 connectDB();
@@ -23,6 +24,7 @@ app.get('/', async (req, res) => {
 });
 
 app.use('/api/pacientes', pacienteRoutes);
+app.use('/api/anamnese', anamneseRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
