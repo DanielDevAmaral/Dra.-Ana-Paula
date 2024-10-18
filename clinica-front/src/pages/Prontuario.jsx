@@ -8,6 +8,7 @@ import TableAnamnese from '../components/TableAnamnese';
 const Prontuario = () => {
     const { id: pacienteId } = useParams();
     const [anamnese, setAnamnese] = useState([]);
+    const [dadoPaciente, setDadoPaciente] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
 
     const handleCloseModal = () => setModalOpen(false);
@@ -19,6 +20,7 @@ const Prontuario = () => {
                 formData,
                 { validateStatus: (status) => status >= 200 && status < 300 }
             );
+            setDadoPaciente(response)
             setAnamnese((prevAnamnese) => [...prevAnamnese, response.data]); // Atualizar anamnese dinamicamente
             setModalOpen(false);
             Swal.fire({
@@ -50,14 +52,14 @@ const Prontuario = () => {
         const fetchDadosPaciente = async () => {
             try {
                 const { data } = await axios.get(`http://localhost:8000/api/pacientes/${pacienteId}`);
-                setAnamnese(data.anamnese || []);
+                setAnamnese(data.anamnese);
             } catch (error) {
                 console.error("Erro ao buscar os dados do Paciente:", error);
             }
         };
 
         fetchDadosPaciente();
-    }, [pacienteId]);
+    }, [dadoPaciente]);
 
     return (
         <div className="home-container">
