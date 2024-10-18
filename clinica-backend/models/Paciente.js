@@ -11,13 +11,13 @@ const familiaSchema = new mongoose.Schema({
 
 const lesaoSchema = new mongoose.Schema({
     local: {type: String, required: true},
-    etiologia: {type: String, required: true},
-    tamanho: {type: String, required: true},
-    profundidade: {type: String, required: true},
-    borda: {type: String, required: true},
-    exudato: {type: String, required: true},
-    quantidadeEx: {type: String, required: true},
-    perilesao: {type: String, required: true},
+    etiologia: {type: String, required: false},
+    tamanho: {type: String, required: false},
+    profundidade: {type: String, required: false},
+    borda: {type: String, required: false},
+    exudato: {type: String, required: false},
+    quantidadeEx: {type: String, required: false},
+    perilesao: {type: String, required: false},
 }, {
     timestamps: true,
 });
@@ -38,12 +38,13 @@ const anamneseSchema = new mongoose.Schema({
     comorbidade: {type: String, required: true},
     lesao: [lesaoSchema],
     conduta: [condutaSchema],
-    plano: {type: String, required: true},
-    esporte: {type: Boolean, required: true},
-    alergia: {type: [String], required: true},
-    gravidez: {type: Boolean, required: true},
-    amamenta: {type: Boolean, required: true},
-    fumo: {type: Boolean, required: true},
+    plano: {type: String, required: false},
+    esporte: {type: Boolean, required: false},
+    alergia: {type: [String], required: false},
+    gravidez: {type: Boolean, required: false},
+    amamenta: {type: Boolean, required: false},
+    fumo: {type: Boolean, required: false},
+    observacao: {type: String, required: false},
 }, {
     timestamps: true,
 });

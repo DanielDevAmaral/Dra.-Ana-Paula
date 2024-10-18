@@ -3,11 +3,7 @@ import {
   Modal,
   Box,
   TextField,
-  Select,
-  MenuItem,
   Button,
-  FormControl,
-  InputLabel,
   IconButton,
   Checkbox,
   FormControlLabel,
@@ -40,6 +36,7 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
     gravidez: false,
     amamenta: false,
     fumo: false,
+    observacao: ""
   });
 
   const handleChange = (e) => {
@@ -75,9 +72,9 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <h2>Registrar Anamnese</h2>
+        <h2>Anamnese</h2>
         <form onSubmit={handleFormSubmit}>
-          {/* Comorbidade */}
+          {/* Campos Gerais da Anamnese */}
           <TextField
             label="Comorbidade"
             name="comorbidade"
@@ -87,8 +84,47 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
             margin="normal"
             required
           />
+          <TextField
+            label="Plano"
+            name="plano"
+            value={formData.plano}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.esporte} onChange={handleChange} name="esporte" />}
+            label="Pratica Esporte"
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.gravidez} onChange={handleChange} name="gravidez" />}
+            label="Está Grávida"
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.amamenta} onChange={handleChange} name="amamenta" />}
+            label="Amamenta"
+          />
+          <FormControlLabel
+            control={<Checkbox checked={formData.fumo} onChange={handleChange} name="fumo" />}
+            label="Fuma"
+          />
+          {formData.alergia.map((alergia, index) => (
+            <TextField
+              key={index}
+              label={`Alergia ${index + 1}`}
+              value={alergia}
+              onChange={(e) => handleAlergiaChange(index, e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+          ))}
+          <IconButton onClick={() => addArrayItem("alergia", "")}>
+            <Add /> Adicionar Alergia
+          </IconButton>
 
           {/* Lesões */}
+          <h2>Detalhes da Lesão</h2>
           {formData.lesao.map((lesao, index) => (
             <div key={index}>
               <TextField
@@ -123,7 +159,38 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
                 margin="normal"
                 required
               />
-              {/* Outros campos */}
+              <TextField
+                label="Característica da Borda"
+                value={lesao.borda}
+                onChange={(e) => handleArrayChange(index, "borda", e.target.value, "lesao")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Exudato"
+                value={lesao.exudato}
+                onChange={(e) => handleArrayChange(index, "exudato", e.target.value, "lesao")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Quantidade de Exudato"
+                value={lesao.quantidadeEx}
+                onChange={(e) => handleArrayChange(index, "quantidadeEx", e.target.value, "lesao")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Perilesão"
+                value={lesao.perilesao}
+                onChange={(e) => handleArrayChange(index, "perilesao", e.target.value, "lesao")}
+                fullWidth
+                margin="normal"
+                required
+              />
               {/* Botão para adicionar nova lesão */}
               <IconButton onClick={() => addArrayItem("lesao", { local: "", etiologia: "", tamanho: "", profundidade: "", borda: "", exudato: "", quantidadeEx: "", perilesao: "" })}>
                 <Add /> Adicionar Lesão
@@ -132,6 +199,7 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
           ))}
 
           {/* Condutas */}
+          <h2>Orientações de Lesão</h2>
           {formData.conduta.map((conduta, index) => (
             <div key={index}>
               <TextField
@@ -150,6 +218,38 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
                 margin="normal"
                 required
               />
+              <TextField
+                label="Proteção"
+                value={conduta.protecao}
+                onChange={(e) => handleArrayChange(index, "protecao", e.target.value, "conduta")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Cobertura"
+                value={conduta.cobertura}
+                onChange={(e) => handleArrayChange(index, "cobertura", e.target.value, "conduta")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Fixação"
+                value={conduta.fixacao}
+                onChange={(e) => handleArrayChange(index, "fixacao", e.target.value, "conduta")}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Determine o periodo de Troca"
+                value={conduta.troca}
+                onChange={(e) => handleArrayChange(index, "troca", e.target.value, "conduta")}
+                fullWidth
+                margin="normal"
+                required
+              />
               <FormControlLabel
                 control={<Checkbox checked={conduta.terapia} onChange={(e) => handleArrayChange(index, "terapia", e.target.checked, "conduta")} />}
                 label="Terapia Adjuvante"
@@ -160,49 +260,16 @@ const FormAnamnese = ({ open, handleClose, handleSubmit }) => {
               </IconButton>
             </div>
           ))}
-
-          {/* Outros campos */}
           <TextField
-            label="Plano"
-            name="plano"
-            value={formData.plano}
+            label="Observação"
+            name="observacao"
+            value={formData.observacao}
             onChange={handleChange}
             fullWidth
+            multiline
+            maxRows={6}
             margin="normal"
-            required
           />
-          <FormControlLabel
-            control={<Checkbox checked={formData.esporte} onChange={handleChange} name="esporte" />}
-            label="Pratica Esporte"
-          />
-          <FormControlLabel
-            control={<Checkbox checked={formData.gravidez} onChange={handleChange} name="gravidez" />}
-            label="Está Grávida"
-          />
-          <FormControlLabel
-            control={<Checkbox checked={formData.amamenta} onChange={handleChange} name="amamenta" />}
-            label="Amamenta"
-          />
-          <FormControlLabel
-            control={<Checkbox checked={formData.fumo} onChange={handleChange} name="fumo" />}
-            label="Fuma"
-          />
-
-          {/* Alergias */}
-          {formData.alergia.map((alergia, index) => (
-            <TextField
-              key={index}
-              label={`Alergia ${index + 1}`}
-              value={alergia}
-              onChange={(e) => handleAlergiaChange(index, e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-          ))}
-          <IconButton onClick={() => addArrayItem("alergia", "")}>
-            <Add /> Adicionar Alergia
-          </IconButton>
-
           <Button
             type="submit"
             variant="contained"

@@ -21,10 +21,12 @@ const AnamneseItem = ({ label, value }) => {
   );
 };
 
-const TableAnamnese = ({ anamneses }) => {
+const TableAnamnese = ({ anamnese }) => {
   // Verifica se existe algum item no array de anamneses
-  const ultimaAnamnese = anamneses.length > 0 ? anamneses[anamneses.length - 1] : null;
+  const ultimaAnamnese = anamnese.length > 0 ? anamnese[anamnese.length - 1] : null;
+  console.log(ultimaAnamnese)
 
+  // Se não houver anamneses, exibe uma mensagem apropriada
   if (!ultimaAnamnese) {
     return <Typography>Não há anamneses disponíveis.</Typography>;
   }
@@ -73,6 +75,7 @@ const TableAnamnese = ({ anamneses }) => {
           >
             <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: '12px' }}>Lesão</Typography>
             <Divider sx={{ borderColor: '#A77E81', marginBottom: '12px' }} />
+            
             {ultimaAnamnese.lesao?.map((lesao, index) => (
               <React.Fragment key={index}>
                 <AnamneseItem label="Local" value={lesao.local} />
@@ -139,5 +142,6 @@ const TableAnamnese = ({ anamneses }) => {
     </Grid>
   );
 };
+
 
 export default TableAnamnese;

@@ -21,6 +21,7 @@ const cadastrarAnamnese = asyncHandler(async (req, res) => {
         gravidez = false, // valor padrão
         amamenta = false, // valor padrão
         fumo = false, // valor padrão
+        observacao = false
     } = req.body;
 
     // Validação se o paciente existe
@@ -40,6 +41,7 @@ const cadastrarAnamnese = asyncHandler(async (req, res) => {
         gravidez,
         amamenta,
         fumo,
+        observacao
     };
 
     // Atualizando o paciente com a nova anamnese no array de anamneses
