@@ -26,7 +26,13 @@ const TableAnamnese = ({ anamneses }) => {
   const ultimaAnamnese = anamneses.length > 0 ? anamneses[anamneses.length - 1] : null;
 
   if (!ultimaAnamnese) {
-    return <Typography>Não há anamneses disponíveis.</Typography>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100%" p={2}>
+        <Typography variant="h6" color="textSecondary" align="center">
+          Nenhuma anamnese registrada
+        </Typography>
+      </Box>
+    );
   }
 
   return (
