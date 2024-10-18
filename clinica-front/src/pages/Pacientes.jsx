@@ -16,47 +16,49 @@ const columns = [
 const Pacientes = () => {
   const [pacientes, setPacientes] = useState([]);
   const [isModalOpen, setModalOpen] = useState(false); // modal refere-se ao formulário de criação de paciente
+  const [loading, setLoading] = useState(true); // Estado para gerenciamento do loading
   
-// Função handleSubmit no componente principal
-const handleSubmitForm = async (formData) => {
-  try {
-    const response = await axios.post(
-      "http://localhost:8000/api/pacientes",
-      formData,
-      { validateStatus: (status) => status >= 200 && status < 300 }
-    );
-    console.log("Paciente salvo com sucesso:", response.data);
-    setPacientes((prevPacientes) => [...prevPacientes, response.data]);
-    setModalOpen(false); // Fechar o modal após o sucesso
-    Swal.fire({
-      title: "Paciente adicionado",
-      text: `${response.data.nome} foi adicionado com sucesso a sua lista de pacientes 🥳`,
-      icon: "success",
-      confirmButtonColor: "#945E62"
-    })
-  } catch (error) {
-    console.error("Erro ao salvar paciente:", error);
-    let errorMessage = "Não foi possível registrar o paciente 🕵️"
+  // Função handleSubmit no componente principal
+  const handleSubmitForm = async (formData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/pacientes",
+        formData,
+        { validateStatus: (status) => status >= 200 && status < 300 }
+      );
+      console.log("Paciente salvo com sucesso:", response.data);
+      setPacientes((prevPacientes) => [...prevPacientes, response.data]);
+      setModalOpen(false); // Fechar o modal após o sucesso
+      Swal.fire({
+        title: "Paciente adicionado",
+        text: `${response.data.nome} foi adicionado com sucesso a sua lista de pacientes 🥳`,
+        icon: "success",
+        confirmButtonColor: "#945E62"
+      });
+    } catch (error) {
+      console.error("Erro ao salvar paciente:", error);
+      let errorMessage = "Não foi possível registrar o paciente 🕵️";
 
-    if(error.response && error.response.data && error.response.data.message){
-      errorMessage = error.response.data.message;
-    };
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
 
-    Swal.fire({
-      title: "Erro ao adicionar Paciente!",
-      text: errorMessage,
-      icon: "error",
-      confirmButtonColor: "#945E62"
-    }).then(() => {
-      setModalOpen(false); // Fechar o modal após exibir o SweetAlert
-    });
-  }
-};
+      Swal.fire({
+        title: "Erro ao adicionar Paciente!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#945E62"
+      }).then(() => {
+        setModalOpen(false); // Fechar o modal após exibir o SweetAlert
+      });
+    }
+  };
 
   const handleCloseModal = () => setModalOpen(false);
 
   useEffect(() => {
     const fetchPacientes = async () => {
+      setLoading(true); // Inicia o loading
       try {
         // Requisição à API para obter os pacientes
         const { data } = await axios.get("http://localhost:8000/api/pacientes");
@@ -73,50 +75,52 @@ const handleSubmitForm = async (formData) => {
         setPacientes(formattedData);
       } catch (error) {
         console.error("Erro ao buscar os pacientes:", error);
+      } finally {
+        setLoading(false); // Finaliza o loading
       }
     };
 
     fetchPacientes();
   }, []);
 
-// Função para deletar um paciente
-const handleDelete = async (paciente) => {
-  Swal.fire({
-    title: `Deseja mesmo apagar ${paciente.nome} do sistema? 😭`,
-    text: "Você não poderá reverter essa ação!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#945E62",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sim, quero deletar"
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        // Faz a requisição DELETE para a API
-        await axios.delete(`http://localhost:8000/api/pacientes/${paciente.id}`);
-        
-        // Atualiza a lista local de pacientes, removendo o paciente deletado
-        setPacientes(pacientes.filter((p) => p.id !== paciente.id));
-        
-        // Exibe a confirmação de exclusão
-        Swal.fire({
-          title: "Deletado!",
-          text: "O paciente foi removido com sucesso.",
-          icon: "success",
-          color: "#945E62"
-        });
-      } catch (error) {
-        // Exibe erro se algo deu errado
-        console.error("Erro ao deletar o paciente:", error);
-        Swal.fire({
-          title: "Erro!",
-          text: "Não foi possível excluir o paciente.",
-          icon: "error"
-        });
+  // Função para deletar um paciente
+  const handleDelete = async (paciente) => {
+    Swal.fire({
+      title: `Deseja mesmo apagar ${paciente.nome} do sistema? 😭`,
+      text: "Você não poderá reverter essa ação!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#945E62",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sim, quero deletar"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Faz a requisição DELETE para a API
+          await axios.delete(`http://localhost:8000/api/pacientes/${paciente.id}`);
+
+          // Atualiza a lista local de pacientes, removendo o paciente deletado
+          setPacientes(pacientes.filter((p) => p.id !== paciente.id));
+
+          // Exibe a confirmação de exclusão
+          Swal.fire({
+            title: "Deletado!",
+            text: "O paciente foi removido com sucesso.",
+            icon: "success",
+            color: "#945E62"
+          });
+        } catch (error) {
+          // Exibe erro se algo deu errado
+          console.error("Erro ao deletar o paciente:", error);
+          Swal.fire({
+            title: "Erro!",
+            text: "Não foi possível excluir o paciente.",
+            icon: "error"
+          });
+        }
       }
-    }
-  });
-};
+    });
+  };
 
   const countPacientes = pacientes.length;
 
@@ -124,18 +128,17 @@ const handleDelete = async (paciente) => {
     <div className="home-container">
       <div className="header-pacientes">
         <div className="header-pacientes-count">
-        <p>
-          Número de pacientes: {countPacientes}
-        </p>
+          <p>
+            Número de pacientes: {countPacientes}
+          </p>
         </div>
-        {/*os parametros "open" e "handleClose" são passados para AddPaciente que passam para FormPaciente*/}
-        <AddPaciente handleSubmit={handleSubmitForm} open={isModalOpen} setModalOpen={setModalOpen} handleClose={handleCloseModal}/>
+        <AddPaciente handleSubmit={handleSubmitForm} open={isModalOpen} setModalOpen={setModalOpen} handleClose={handleCloseModal} />
       </div>
       <TableComponent
         columns={columns}
         rows={pacientes}
         onDelete={handleDelete}
-        id={pacientes.id}
+        loading={loading} // Passando o estado de loading para o TableComponent
       />
     </div>
   );
