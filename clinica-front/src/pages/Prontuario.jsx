@@ -4,11 +4,12 @@ import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import AddAnamnese from '../components/AddAnamnese';
 import TableAnamnese from '../components/TableAnamnese';
+import HeaderPaciente from '../components/HeaderPaciente';
 
 const Prontuario = () => {
     const { id: pacienteId } = useParams();
-    const [anamnese, setAnamnese] = useState([]);
-    const [dadoPaciente, setDadoPaciente] = useState([]);
+    const [paciente, setPaciente] = useState([]);
+    const [updater, setUpdater] = useState([]);
     const [isModalOpen, setModalOpen] = useState(false);
 
     const handleCloseModal = () => setModalOpen(false);
@@ -20,8 +21,8 @@ const Prontuario = () => {
                 formData,
                 { validateStatus: (status) => status >= 200 && status < 300 }
             );
-            setDadoPaciente(response)
-            setAnamnese((prevAnamnese) => [...prevAnamnese, response.data]); // Atualizar anamnese dinamicamente
+            setUpdater(response)
+            setPaciente((prevAnamnese) => [...prevAnamnese.anamnese, response.data]); // Atualizar anamnese dinamicamente
             setModalOpen(false);
             Swal.fire({
                 title: "Anamnese registrada com sucesso",
@@ -52,21 +53,22 @@ const Prontuario = () => {
         const fetchDadosPaciente = async () => {
             try {
                 const { data } = await axios.get(`http://localhost:8000/api/pacientes/${pacienteId}`);
-                setAnamnese(data.anamnese);
+                setPaciente(data);
             } catch (error) {
                 console.error("Erro ao buscar os dados do Paciente:", error);
             }
         };
 
         fetchDadosPaciente();
-    }, [dadoPaciente]);
+    }, [updater]);
 
     return (
         <div className="home-container">
             <div className="header-pacientes">
-                <AddAnamnese handleSubmit={handleSubmitForm} open={isModalOpen} setModalOpen={setModalOpen} handleClose={handleCloseModal} />
+                <HeaderPaciente paciente={paciente}/>
+                <AddAnamnese handleSubmit={handleSubmitForm} open={isModalOpen} setModalOpen={setModalOpen} handleClose={handleCloseModal} pacienteDados={paciente}/>
             </div>
-            <TableAnamnese anamneses={anamnese} /> {/* Passar a anamnese como prop */}
+            <TableAnamnese pacienteDados={paciente} /> {/* Passar a anamnese como prop */}
         </div>
     );
 };

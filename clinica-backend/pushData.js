@@ -24,7 +24,7 @@ const populateAnamnese = async () => {
         await connectDB();
 
         // ID do paciente que será atualizado
-        const pacienteId = '670aca495bb58451d26109fb';
+        const pacienteId = '6713c28b65c64432f097a019';
 
         // Dados da nova anamnese
         const novaAnamnese = {

@@ -1,5 +1,6 @@
 const asyncHandler = require('../middleware/asyncHandler.js');
 const Paciente = require('../models/Paciente.js');
+const validateCpf = require('validar-cpf');
 
 // @desc Fetch all Pacientes
 // @route GET /api/pacientes
@@ -43,6 +44,12 @@ const cadastrarPaciente = asyncHandler(async (req, res) => {
     if (pacienteExistente) {
         res.status(400);
         throw new Error('Já existe um paciente cadastrado com esse CPF, por favor mude o CPF 🔎');
+    }
+
+    // Valida se o CPF segue os padrões Brasileiros ou se é falso
+    if (!validateCpf(cpf)){
+        res.status(400);
+        throw new Error('Esse CPF não existe, confira com o Paciente nomavente o número correto 🔎');
     }
 
     const numeroExistente = await Paciente.findOne({ numero });
