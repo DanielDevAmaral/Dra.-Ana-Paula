@@ -10,6 +10,7 @@ import App from './App';
 import HomeScreen from './pages/HomeScreen';
 import Pacientes from './pages/Pacientes';
 import Prontuario from './pages/Prontuario';
+import Agenda from './pages/Agenda';
 import './index.css';
 
 const router = createBrowserRouter(
@@ -18,6 +19,7 @@ const router = createBrowserRouter(
       <Route index={true} path="/" element={<HomeScreen />} />
       <Route path="/pacientes" element={<Pacientes />} />
       <Route path="/pacientes/:id" element={<Prontuario />} />
+      <Route path="/agenda" element={<Agenda />} />
     </Route>
   )
 );
