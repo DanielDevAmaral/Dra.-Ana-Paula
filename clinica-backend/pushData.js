@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Agenda = require('./models/Agenda'); // Supondo que este seja o caminho do modelo Agenda
 const Paciente = require('./models/Paciente'); // Supondo que este seja o caminho do modelo Paciente
 
 // Conectando ao MongoDB manualmente com a URI fornecida
@@ -18,63 +19,46 @@ const connectDB = async () => {
     }
 };
 
-const populateAnamnese = async () => {
+const inserirAgenda = async () => {
     try {
         // Conectando ao banco de dados
         await connectDB();
 
-        // ID do paciente que será atualizado
+        // ID do paciente que será vinculado à agenda
         const pacienteId = '6713c28b65c64432f097a019';
 
-        // Dados da nova anamnese
-        const novaAnamnese = {
-            comorbidade: 'Diabetes tipo 2',
-            lesao: [{
-                local: 'Perna direita',
-                etiologia: 'Trauma',
-                tamanho: '3cm x 2cm',
-                profundidade: 'Superficial',
-                borda: 'Irregular',
-                exudato: 'Sero-purulento',
-                quantidadeEx: 'Moderada',
-                perilesao: 'Eritema',
-            }],
-            conduta: [{
-                desbridamento: 'Enzimático',
-                limpeza: 'Solução salina',
-                protecao: 'Protetor de pele líquido',
-                cobertura: 'Espuma com prata',
-                fixacao: 'Fita adesiva hipoalergênica',
-                troca: 'A cada 3 dias',
-                terapia: true, // Fez uso de terapia adjuvante
-            }],
-            plano: 'Manter controle glicêmico rigoroso e acompanhamento semanal da lesão',
-            esporte: false,
-            alergia: ['Penicilina'],
-            gravidez: false,
-            amamenta: false,
-            fumo: true,
+        // Verificar se o paciente existe no banco de dados
+        const paciente = await Paciente.findById(pacienteId);
+
+        if (!paciente) {
+            console.log('Paciente não encontrado.');
+            return;
+        }
+
+        // Dados da nova agenda
+        const novaAgenda = {
+            data: new Date('2024-10-30'), // Exemplo de data
+            horarioInicio: '09:00',
+            horarioFim: '10:00',
+            paciente: pacienteId, // Vincular o paciente à agenda
+            comentarios: 'Consulta de rotina',
         };
 
-        // Atualizar o paciente com a nova anamnese
-        const pacienteAtualizado = await Paciente.findByIdAndUpdate(
-            pacienteId,
-            { $push: { anamnese: novaAnamnese } }, // Adiciona a nova anamnese ao array de anamneses
-            { new: true, useFindAndModify: false }  // Retorna o documento atualizado
-        );
+        // Criar a nova agenda no banco de dados
+        const agendaCriada = await Agenda.create(novaAgenda);
 
-        if (pacienteAtualizado) {
-            console.log('Anamnese adicionada com sucesso:', pacienteAtualizado);
+        if (agendaCriada) {
+            console.log('Agenda criada com sucesso:', agendaCriada);
         } else {
-            console.log('Paciente não encontrado.');
+            console.log('Erro ao criar agenda.');
         }
 
     } catch (error) {
-        console.error('Erro ao adicionar anamnese:', error);
+        console.error('Erro ao criar agenda:', error);
     } finally {
         mongoose.connection.close(); // Fecha a conexão após a operação
     }
 };
 
 // Executar a função
-populateAnamnese();
+inserirAgenda();

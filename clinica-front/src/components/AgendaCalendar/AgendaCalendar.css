@@ -1,0 +1,18 @@
+.calendar{
+    height: 500px;
+}
+
+.rbc-header{
+    text-transform: uppercase;
+    color: #A77E81;
+}
+
+.rbc-today{
+    background-color: rgb(167, 126, 129, 0.4);
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+    color: #A77E81;
+    font-weight: bold;
+    text-transform: uppercase;
+}

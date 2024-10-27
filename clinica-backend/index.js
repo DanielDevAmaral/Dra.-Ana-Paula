@@ -8,6 +8,7 @@ const connectDB = require('./config/db');
 const morgan = require('morgan');
 const pacienteRoutes = require('./routes/pacientesRoutes')
 const anamneseRoutes = require('./routes/anamneseRoutes')
+const agendaRoutes = require('./routes/agendaRoutes')
 const {notFound, errorHandler} = require('./middleware/errorMiddleware');
 
 connectDB();
@@ -27,6 +28,7 @@ app.get('/', async (req, res) => {
 
 app.use('/api/pacientes', pacienteRoutes);
 app.use('/api/anamnese', anamneseRoutes);
+app.use('/api/agenda', agendaRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
 
 const agendaSchema = new mongoose.Schema({
-  data: { type: Date, required: true },
-  horarioInicio: { type: String, required: true },
-  horarioFim: { type: String, required: true },
+  start: { type: Date, required: true },
+  end: { type: Date, required: true },
+  desc: { type: String, required: true },
+  color: { type: String, required: false },
+  tipo: { type: String, required: false },
   paciente: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Paciente', 
-    required: true 
+    required: false 
   }, // Vinculação com um paciente já existente
-  comentarios: { type: String, required: false },
 }, {
   timestamps: true,
 });
