@@ -17,6 +17,7 @@ const style = {
 
 const FormAgenda = ({ open, handleClose, handleSubmit }) => {
   const [formData, setFormData] = useState({
+    title: "",
     start: "",
     end: "",
     desc: "",
@@ -43,6 +44,15 @@ const FormAgenda = ({ open, handleClose, handleSubmit }) => {
       <Box sx={style}>
         <h2>Marcar Consulta 🥳</h2>
         <form onSubmit={handleFormSubmit}>
+          <TextField
+            label="Titulo"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
           <TextField
             label="Inicio da Consulta"
             name="start"

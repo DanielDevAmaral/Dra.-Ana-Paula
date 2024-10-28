@@ -45,22 +45,20 @@ const Agenda = () => {
         }
     };
 
-    // Função para atualizar um evento existente
-    const handleEventChange = async ({ start, end, event }) => {
-        const updatedEvent = { ...event, start, end };
-        console.log(event)
-    
-        if (!event.id) { 
+    const handleEventChange = async ({ event, start, end }) => {
+        if (!event.id) {
             console.error("ID do evento não encontrado.");
             return;
         }
     
-        try {
-            const response = await axios.put(`/api/agenda/${event.id}`, updatedEvent); // Confirme se `event.id` está correto
+        const updatedEvent = { ...event, start, end }; // Atualize o evento com os novos horários
     
+        try {
+            const response = await axios.put(`http://localhost:8000/api/agenda/${event.id}`, updatedEvent);
+            
             if (response.status === 200) {
                 setEvents((prevEvents) =>
-                    prevEvents.map((ev) => (ev.id === event.id ? updatedEvent : ev))
+                    prevEvents.map((ev) => (ev.id === event.id ? { ...ev, start, end } : ev))
                 );
             } else {
                 console.error("Erro ao atualizar o evento:", response.statusText);
@@ -95,7 +93,7 @@ const Agenda = () => {
                     handleClose={handleCloseModal}
                 />
             </div>
-            <AgendaCalendar eventos={events} onEventChange={handleEventChange} />
+            <AgendaCalendar eventos={events} onEventChange={handleEventChange} setEventos={setEvents}/>
         </div>
     );
 };

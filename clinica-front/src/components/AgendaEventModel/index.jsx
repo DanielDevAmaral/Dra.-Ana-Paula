@@ -31,6 +31,7 @@ const modalStyle = {
 const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
+    title: evento.title,
     start: evento.start,
     end: evento.end,
     desc: evento.desc,
@@ -49,7 +50,7 @@ const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
 
   const handleEdit = () => setEditMode(true);
   const handleSave = () => {
-    onEdit(formData);
+    onEdit({ ...formData, id: evento.id }); // Adiciona o ID do evento ao formData
     setEditMode(false);
   };
 
@@ -67,7 +68,21 @@ const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
 
         {editMode ? (
           // Formulário de edição
-          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSave();
+            }}
+          >
+            <TextField
+              label="Titulo"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              required
+            />
             <TextField
               label="Inicio da Consulta"
               name="start"
@@ -106,11 +121,24 @@ const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
                 onChange={handleChange}
                 label="Cor do Evento"
               >
-                <MenuItem value="blue" style={{ color: "blue" }}>Azul</MenuItem>
-                <MenuItem value="yellow" style={{ color: "yellow" }}>Amarelo</MenuItem>
-                <MenuItem value="clearRed" style={{ color: "rgba(255, 0, 0, 0.6)" }}>Vermelho</MenuItem>
-                <MenuItem value="lightGreen" style={{ color: "lightgreen" }}>Verde</MenuItem>
-                <MenuItem value="lightPurple" style={{ color: "plum" }}>Roxo</MenuItem>
+                <MenuItem value="blue" style={{ color: "blue" }}>
+                  Azul
+                </MenuItem>
+                <MenuItem value="yellow" style={{ color: "yellow" }}>
+                  Amarelo
+                </MenuItem>
+                <MenuItem
+                  value="rgba(255, 0, 0, 0.6)"
+                  style={{ color: "rgba(255, 0, 0, 0.6)" }}
+                >
+                  Vermelho
+                </MenuItem>
+                <MenuItem value="lightGreen" style={{ color: "lightgreen" }}>
+                  Verde
+                </MenuItem>
+                <MenuItem value="purple" style={{ color: "purple" }}>
+                  Roxo
+                </MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth margin="normal">
@@ -144,7 +172,9 @@ const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
         ) : (
           // Visualização do evento
           <>
-            <Typography variant="body1" mt={2}>Descrição: {evento.desc}</Typography>
+            <Typography variant="body1" mt={2}>
+              Descrição: {evento.desc}
+            </Typography>
             <Typography variant="body2" color="textSecondary">
               Início: {new Date(evento.start).toLocaleString()}
             </Typography>

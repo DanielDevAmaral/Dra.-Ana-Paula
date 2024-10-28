@@ -11,7 +11,7 @@ const getAgenda = asyncHandler(async (req, res) => {
         // Formata os dados para o React Big Calendar
         const eventosFormatados = agenda.map(evento => ({
             id: evento.id,
-            title: evento.desc || 'Consulta', // Corrigido para 'desc'
+            title: evento.title,
             start: evento.start, // Uso direto dos campos start e end
             end: evento.end,
             paciente: evento.paciente,
@@ -31,16 +31,17 @@ const getAgenda = asyncHandler(async (req, res) => {
 // @access public
 const cadastrarAgenda = asyncHandler(async (req, res) => {
     // Extraindo os campos do corpo da requisição
-    const { start, end, desc, color, tipo, paciente } = req.body;
+    const { title, start, end, desc, color, tipo, paciente } = req.body;
 
     // Validação dos campos obrigatórios
-    if (!start || !end || !desc) { // Corrigido para incluir desc
+    if (!title || !start || !end || !desc) { // Corrigido para incluir desc
         res.status(400);
         throw new Error('Preencha todos os campos obrigatórios 🔎');
     }
 
     // Cria um novo Evento com os campos extraídos
     const novoEvento = new Agenda({
+        title,
         start,
         end,
         desc,
@@ -64,7 +65,7 @@ const cadastrarAgenda = asyncHandler(async (req, res) => {
 // @access public
 const atualizarAgenda = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { start, end, desc, color, tipo, paciente } = req.body;
+    const { title, start, end, desc, color, tipo, paciente } = req.body;
 
     // Busca o evento pelo ID
     const evento = await Agenda.findById(id);
@@ -74,12 +75,13 @@ const atualizarAgenda = asyncHandler(async (req, res) => {
         throw new Error('Evento não encontrado');
     }
 
-    if (!start || !end || !tipo) {
+    if (!title || !start || !end || !tipo) {
         res.status(404);
         throw new Error('Preencha todos os campos obrigatórios 🔎');
     }
 
     // Atualiza os campos do evento
+    evento.title = title || evento.title;
     evento.start = start || evento.start;
     evento.end = end || evento.end;
     evento.desc = desc || evento.desc;
