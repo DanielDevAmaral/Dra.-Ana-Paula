@@ -8,6 +8,7 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
+  height: "84vh",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -15,7 +16,7 @@ const style = {
   overflowY: "auto",
 };
 
-const FormAgenda = ({ open, handleClose, handleSubmit }) => {
+const FormAgenda = ({ open, handleClose, handleSubmit, pacientes }) => {
   const [formData, setFormData] = useState({
     title: "",
     start: "",
@@ -23,7 +24,7 @@ const FormAgenda = ({ open, handleClose, handleSubmit }) => {
     desc: "",
     color: "",
     tipo: "",
-    paciente: "",
+    paciente: "", // Campo opcional
   });
 
   const handleChange = (e) => {
@@ -110,6 +111,22 @@ const FormAgenda = ({ open, handleClose, handleSubmit }) => {
               <MenuItem value="PrimeiraConsulta">Primeira Consulta</MenuItem>
               <MenuItem value="Emergencial">Emergencial</MenuItem>
               <MenuItem value="Avaliacao">Avaliação</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Paciente</InputLabel>
+            <Select
+              name="paciente"
+              value={formData.paciente}
+              onChange={handleChange}
+              label="Paciente"
+            >
+              <MenuItem value="">Nenhum</MenuItem>
+              {pacientes.map((paciente) => (
+                <MenuItem key={paciente._id} value={paciente._id}>
+                  {paciente.nome}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <Button

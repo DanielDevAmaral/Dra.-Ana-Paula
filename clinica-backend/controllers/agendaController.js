@@ -98,7 +98,7 @@ const atualizarAgenda = asyncHandler(async (req, res) => {
 // @route GET /api/agenda/:id
 // @access public
 const getAgendaById = asyncHandler(async (req, res) => {
-    const agenda = await Agenda.findById(req.params.id).populate('paciente', 'nome');
+    const agenda = await Agenda.findById(req.params.id);
 
     if (agenda) {
        return res.json(agenda);

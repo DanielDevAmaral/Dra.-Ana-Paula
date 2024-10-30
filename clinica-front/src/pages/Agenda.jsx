@@ -11,20 +11,24 @@ const Agenda = () => {
     const [events, setEvents] = useState([]);
     const [updater, setUpdater] = useState([]); // Controle de atualização do estado
     const [isModalOpen, setModalOpen] = useState(false);
+    const [pacientes, setPacientes] = useState([]);
 
     const handleCloseModal = () => setModalOpen(false);
 
     // Função para registrar um novo evento
     const handleSubmitForm = async (formData) => {
         try {
+            // Verifique se o campo paciente está sendo passado como esperado
             const response = await axios.post(
-                `http://localhost:8000/api/agenda`, // URL corrigida
-                { ...formData, paciente: pacienteId }
+                `http://localhost:8000/api/agenda`,
+                { ...formData, paciente: formData.paciente || null } // Adicione o paciente como null se não selecionado
             );
+    
             // Atualiza a lista de eventos com o novo evento
             setEvents((prevEvents) => [...prevEvents, response.data]);
             setUpdater((prevUpdater) => !prevUpdater); // Força atualização
             setModalOpen(false); // Fecha o modal após o sucesso
+    
             Swal.fire({
                 title: "Evento registrado com sucesso",
                 text: `Todos os dados foram registrados.`,
@@ -68,6 +72,20 @@ const Agenda = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchPacientes = async () => {
+          try {
+            // Requisição à API para obter os pacientes
+            const { data } = await axios.get("http://localhost:8000/api/pacientes");
+            setPacientes(data);
+          } catch (error) {
+            console.error("Erro ao buscar os pacientes:", error);
+          }
+        };
+    
+        fetchPacientes();
+      }, []);
+
     // Função para buscar todos os eventos de um paciente específico
     useEffect(() => {
         const fetchEvents = async () => {
@@ -91,6 +109,7 @@ const Agenda = () => {
                     open={isModalOpen}
                     setModalOpen={setModalOpen}
                     handleClose={handleCloseModal}
+                    pacientes={pacientes}
                 />
             </div>
             <AgendaCalendar eventos={events} onEventChange={handleEventChange} setEventos={setEvents}/>

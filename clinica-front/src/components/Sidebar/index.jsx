@@ -14,8 +14,8 @@ const Sidebar = () => (
     </div>
     <nav>
       <ul>
-        <li className="disabled">
-          <Link to={`/agenda`}><span>Agenda {lockIcon}</span></Link>
+        <li className="pacientes">
+          <Link to={`/agenda`}><span>Agenda</span></Link>
         </li>
         <li className="disabled">
         <Link to={`/financeiro`}><span>Financeiro {lockIcon}</span></Link>

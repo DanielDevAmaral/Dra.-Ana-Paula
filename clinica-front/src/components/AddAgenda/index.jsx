@@ -4,7 +4,7 @@ import { Add } from '@mui/icons-material';
 import FormAgenda from '../FormAgenda';
 import './AddAgenda.css';
 
-const AddAgenda = ({ handleSubmit, open, setModalOpen, handleClose }) => {
+const AddAgenda = ({ handleSubmit, open, setModalOpen, handleClose, pacientes }) => {
   return (
     <div>
       <Button
@@ -35,6 +35,7 @@ const AddAgenda = ({ handleSubmit, open, setModalOpen, handleClose }) => {
         open={open}
         handleClose={handleClose}
         handleSubmit={handleSubmit}
+        pacientes={pacientes}
       />
     </div>
   );
