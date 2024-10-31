@@ -55,6 +55,12 @@ const cadastrarAgenda = asyncHandler(async (req, res) => {
     // Salvando o Evento no banco de dados
     const eventoSalvo = await novoEvento.save();
 
+    // Enviando sinal para o terminal
+    console.log("Evento adicionado com sucesso");
+    
+    // Retorna o Evento cadastrado com sucesso
+    res.status(200).json(eventoSalvo);
+
     // Enviar e-mail ao paciente se o e-mail for válido
     const pacienteData = await novoEvento.populate('paciente', 'nome email');
     const pacienteEmail = pacienteData.paciente?.email;
@@ -68,12 +74,6 @@ const cadastrarAgenda = asyncHandler(async (req, res) => {
     } else {
         console.warn("Paciente não possui e-mail válido cadastrado.");
     }
-    
-    // Enviando sinal para o terminal
-    console.log("Evento adicionado com sucesso");
-
-    // Retorna o Evento cadastrado com sucesso
-    res.status(200).json(eventoSalvo);
 });
 
 // @desc Atualizar Evento
