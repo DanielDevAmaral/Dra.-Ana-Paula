@@ -37,7 +37,12 @@ const FormAgenda = ({ open, handleClose, handleSubmit, pacientes }) => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    handleSubmit(formData); // Envia os dados ao backend
+    const eventData = {
+      ...formData,
+      start: new Date(formData.start),
+      end: new Date(formData.end),
+    };
+    handleSubmit(eventData); // Envia os dados ao backend
   };
 
   return (

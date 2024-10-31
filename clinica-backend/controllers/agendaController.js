@@ -1,4 +1,6 @@
 const asyncHandler = require('../middleware/asyncHandler.js');
+const validator = require('validator');
+const sendEmail = require('../services/emailService.js'); 
 const Agenda = require('../models/Agenda.js');
 
 // @desc Fetch all Eventos
@@ -12,8 +14,8 @@ const getAgenda = asyncHandler(async (req, res) => {
         const eventosFormatados = agenda.map(evento => ({
             id: evento.id,
             title: evento.title,
-            start: evento.start, // Uso direto dos campos start e end
-            end: evento.end,
+            start: new Date(evento.start),  // Convert to JavaScript Date object
+            end: new Date(evento.end),      // Convert to JavaScript Date object
             paciente: evento.paciente,
             color: evento.color,
             tipo: evento.tipo,
@@ -42,8 +44,8 @@ const cadastrarAgenda = asyncHandler(async (req, res) => {
     // Cria um novo Evento com os campos extraídos
     const novoEvento = new Agenda({
         title,
-        start,
-        end,
+        start: new Date(start),  // Convert to JavaScript Date object if needed
+        end: new Date(end),      // Convert to JavaScript Date object if needed
         desc,
         color,
         tipo,
@@ -53,6 +55,20 @@ const cadastrarAgenda = asyncHandler(async (req, res) => {
     // Salvando o Evento no banco de dados
     const eventoSalvo = await novoEvento.save();
 
+    // Enviar e-mail ao paciente se o e-mail for válido
+    const pacienteData = await novoEvento.populate('paciente', 'nome email');
+    const pacienteEmail = pacienteData.paciente?.email;
+
+    if (pacienteEmail && validator.isEmail(pacienteEmail)) {
+        await sendEmail(
+            pacienteEmail,
+            'Confirmação de Consulta',
+            `Olá ${pacienteData.paciente.nome},\n\nSua consulta está agendada para ${new Date(start).toLocaleString()}.\n\nAtenciosamente, Clínica`
+        );
+    } else {
+        console.warn("Paciente não possui e-mail válido cadastrado.");
+    }
+    
     // Enviando sinal para o terminal
     console.log("Evento adicionado com sucesso");
 

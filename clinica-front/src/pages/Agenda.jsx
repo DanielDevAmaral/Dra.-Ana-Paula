@@ -90,16 +90,28 @@ const Agenda = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const { data } = await axios.get(
-                    `http://localhost:8000/api/agenda?paciente=${pacienteId}`
-                );
-                setEvents(data);
+                const { data } = await axios.get(`http://localhost:8000/api/agenda`);
+        
+                // Filter out invalid events and ensure `start` and `end` are valid Date objects
+                const validEvents = data
+                    .filter(event => event.start && event.end)
+                    .map(event => ({
+                        ...event,
+                        start: new Date(event.start),
+                        end: new Date(event.end),
+                    }));
+                
+                console.log(validEvents);
+                
+                setEvents(validEvents);
             } catch (error) {
                 console.error("Erro ao buscar os dados da agenda:", error);
             }
         };
+        
         fetchEvents();
     }, [updater, pacienteId]);
+    
 
     return (
         <div className="agenda-container">

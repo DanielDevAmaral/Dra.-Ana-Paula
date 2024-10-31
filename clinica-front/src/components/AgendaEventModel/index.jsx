@@ -21,6 +21,7 @@ const modalStyle = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
+  height: "84vh",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -28,7 +29,7 @@ const modalStyle = {
   overflowY: "auto",
 };
 
-const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
+const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit, pacientes }) => {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     title: evento.title,
@@ -59,7 +60,7 @@ const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
       <Box sx={modalStyle}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">
-            {editMode ? "Editar Evento" : evento.title}
+            {editMode ? "Editar Consulta" : evento.title}
           </Typography>
           <IconButton onClick={onClose}>
             <CloseIcon />
@@ -155,6 +156,22 @@ const AgendaEventModel = ({ evento, open, onClose, onDelete, onEdit }) => {
                 <MenuItem value="Avaliacao">Avaliação</MenuItem>
               </Select>
             </FormControl>
+            <FormControl fullWidth margin="normal">
+            <InputLabel>Paciente</InputLabel>
+            <Select
+              name="paciente"
+              value={formData.paciente}
+              onChange={handleChange}
+              label="Paciente"
+            >
+              <MenuItem value="">Nenhum</MenuItem>
+              {pacientes.map((paciente) => (
+                <MenuItem key={paciente._id} value={paciente._id}>
+                  {paciente.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
             <Button
               type="submit"
               variant="contained"
