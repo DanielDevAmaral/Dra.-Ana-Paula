@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node clinica-backend/index.js",
     "server": "nodemon clinica-backend/index.js",
-    "build": "react-scripts build",
+    "build:backend": "npm install --prefix clinica-backend",
     "client": "npm start --prefix clinica-front",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
