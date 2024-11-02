@@ -20,7 +20,7 @@ const Agenda = () => {
         try {
             // Verifique se o campo paciente está sendo passado como esperado
             const response = await axios.post(
-                `http://localhost:8000/api/agenda`,
+                `https://dra-ana-paula.onrender.com/api/agenda`,
                 { ...formData, paciente: formData.paciente || null } // Adicione o paciente como null se não selecionado
             );
     
@@ -58,7 +58,7 @@ const Agenda = () => {
         const updatedEvent = { ...event, start, end }; // Atualize o evento com os novos horários
     
         try {
-            const response = await axios.put(`http://localhost:8000/api/agenda/${event.id}`, updatedEvent);
+            const response = await axios.put(`https://dra-ana-paula.onrender.com/api/agenda/${event.id}`, updatedEvent);
             
             if (response.status === 200) {
                 setEvents((prevEvents) =>
@@ -76,7 +76,7 @@ const Agenda = () => {
         const fetchPacientes = async () => {
           try {
             // Requisição à API para obter os pacientes
-            const { data } = await axios.get("http://localhost:8000/api/pacientes");
+            const { data } = await axios.get("https://dra-ana-paula.onrender.com/api/pacientes");
             setPacientes(data);
           } catch (error) {
             console.error("Erro ao buscar os pacientes:", error);
@@ -90,7 +90,7 @@ const Agenda = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const { data } = await axios.get(`http://localhost:8000/api/agenda`);
+                const { data } = await axios.get(`https://dra-ana-paula.onrender.com/api/agenda`);
         
                 // Filter out invalid events and ensure `start` and `end` are valid Date objects
                 const validEvents = data

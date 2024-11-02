@@ -22,7 +22,7 @@ const Pacientes = () => {
   const handleSubmitForm = async (formData) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/pacientes",
+        "https://dra-ana-paula.onrender.com/api/pacientes",
         formData,
         { validateStatus: (status) => status >= 200 && status < 300 }
       );
@@ -61,7 +61,7 @@ const Pacientes = () => {
       setLoading(true); // Inicia o loading
       try {
         // Requisição à API para obter os pacientes
-        const { data } = await axios.get("http://localhost:8000/api/pacientes");
+        const { data } = await axios.get("https://dra-ana-paula.onrender.com/api/pacientes");
 
         // Mapeando os dados recebidos para o formato esperado pelas linhas da tabela
         const formattedData = data.map((paciente) => ({
@@ -97,7 +97,7 @@ const Pacientes = () => {
       if (result.isConfirmed) {
         try {
           // Faz a requisição DELETE para a API
-          await axios.delete(`http://localhost:8000/api/pacientes/${paciente.id}`);
+          await axios.delete(`https://dra-ana-paula.onrender.com/api/pacientes/${paciente.id}`);
 
           // Atualiza a lista local de pacientes, removendo o paciente deletado
           setPacientes(pacientes.filter((p) => p.id !== paciente.id));
