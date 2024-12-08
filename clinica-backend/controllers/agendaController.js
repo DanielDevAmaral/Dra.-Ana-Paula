@@ -14,6 +14,7 @@ const getAgenda = asyncHandler(async (req, res) => {
         const eventosFormatados = agenda.map(evento => ({
             id: evento.id,
             title: evento.title,
+            desc: evento.desc,
             start: new Date(evento.start),  // Convert to JavaScript Date object
             end: new Date(evento.end),      // Convert to JavaScript Date object
             paciente: evento.paciente,

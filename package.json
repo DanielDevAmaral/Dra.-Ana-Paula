@@ -25,7 +25,7 @@
     "body-parser": "^1.20.2",
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "express": "^4.19.2",
     "fullcalendar": "^6.1.14",
     "mongoose": "^8.4.1",

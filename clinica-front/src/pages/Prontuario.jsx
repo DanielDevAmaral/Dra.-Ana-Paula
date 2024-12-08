@@ -16,8 +16,9 @@ const Prontuario = () => {
 
     const handleSubmitForm = async (formData) => {
         try {
+            //local test: http://localhost:8000/api/anamnese
             const response = await axios.post(
-                `https://dra-ana-paula.onrender.com/api/anamnese/${pacienteId}`,
+                `http://localhost:8000/api/anamnese/${pacienteId}`,
                 formData,
                 { validateStatus: (status) => status >= 200 && status < 300 }
             );
@@ -52,7 +53,8 @@ const Prontuario = () => {
     useEffect(() => {
         const fetchDadosPaciente = async () => {
             try {
-                const { data } = await axios.get(`https://dra-ana-paula.onrender.com/api/pacientes/${pacienteId}`);
+                //local test: http://localhost:8000/api/pacientes
+                const { data } = await axios.get(`http://localhost:8000/api/pacientes/${pacienteId}`);
                 setPaciente(data);
             } catch (error) {
                 console.error("Erro ao buscar os dados do Paciente:", error);
@@ -68,7 +70,7 @@ const Prontuario = () => {
                 <HeaderPaciente paciente={paciente}/>
                 <AddAnamnese handleSubmit={handleSubmitForm} open={isModalOpen} setModalOpen={setModalOpen} handleClose={handleCloseModal} pacienteDados={paciente}/>
             </div>
-            <TableAnamnese pacienteDados={paciente} /> {/* Passar a anamnese como prop */}
+            <TableAnamnese pacienteDados={paciente} /> 
         </div>
     );
 };

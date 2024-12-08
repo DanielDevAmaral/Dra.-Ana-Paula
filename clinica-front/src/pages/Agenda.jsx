@@ -19,8 +19,9 @@ const Agenda = () => {
     const handleSubmitForm = async (formData) => {
         try {
             // Verifique se o campo paciente está sendo passado como esperado
+            //local test: http://localhost:8000/api/agenda
             const response = await axios.post(
-                `https://dra-ana-paula.onrender.com/api/agenda`,
+                `http://localhost:8000/api/agenda`,
                 { ...formData, paciente: formData.paciente || null } // Adicione o paciente como null se não selecionado
             );
     
@@ -58,7 +59,8 @@ const Agenda = () => {
         const updatedEvent = { ...event, start, end }; // Atualize o evento com os novos horários
     
         try {
-            const response = await axios.put(`https://dra-ana-paula.onrender.com/api/agenda/${event.id}`, updatedEvent);
+            //local test: http://localhost:8000/api/agenda
+            const response = await axios.put(`http://localhost:8000/api/agenda/${event.id}`, updatedEvent);
             
             if (response.status === 200) {
                 setEvents((prevEvents) =>
@@ -76,7 +78,8 @@ const Agenda = () => {
         const fetchPacientes = async () => {
           try {
             // Requisição à API para obter os pacientes
-            const { data } = await axios.get("https://dra-ana-paula.onrender.com/api/pacientes");
+            //local test: http://localhost:8000/api/pacientes
+            const { data } = await axios.get("http://localhost:8000/api/pacientes");
             setPacientes(data);
           } catch (error) {
             console.error("Erro ao buscar os pacientes:", error);
@@ -90,29 +93,36 @@ const Agenda = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const { data } = await axios.get(`https://dra-ana-paula.onrender.com/api/agenda`);
-        
-                // Filter out invalid events and ensure `start` and `end` are valid Date objects
+                const { data } = await axios.get(`http://localhost:8000/api/agenda`);
+    
                 const validEvents = data
                     .filter(event => event.start && event.end)
                     .map(event => ({
-                        ...event,
+                        id: event.id,
+                        title: event.title,
+                        desc: event.desc,
                         start: new Date(event.start),
                         end: new Date(event.end),
+                        tipo: event.tipo,
+                        paciente: {
+                            _id: event.paciente._id,
+                            nome: event.paciente.nome, 
+                        },
+                        color: event.color,
                     }));
-                
-                console.log(validEvents);
-                
+    
+                console.log('Valid Events:', validEvents);
                 setEvents(validEvents);
             } catch (error) {
-                console.error("Erro ao buscar os dados da agenda:", error);
+                console.error("Error fetching agenda data:", error);
             }
         };
-        
+    
         fetchEvents();
     }, [updater, pacienteId]);
     
-
+    console.log('Events State:', events);
+    
     return (
         <div className="agenda-container">
             <div className="header-agenda">

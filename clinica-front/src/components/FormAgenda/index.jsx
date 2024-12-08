@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Modal, Box, TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import "./FormAgenda.css";
 
 const style = {
@@ -59,26 +62,48 @@ const FormAgenda = ({ open, handleClose, handleSubmit, pacientes }) => {
             margin="normal"
             required
           />
-          <TextField
-            label="Inicio da Consulta"
-            name="start"
-            type="datetime-local"
-            value={formData.start}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
-          <TextField
-            label="Fim da Consulta"
-            name="end"
-            type="datetime-local"
-            value={formData.end}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            required
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <Box display="flex" gap={2} marginY={2}>
+              <DatePicker
+                label="Data de Início"
+                value={formData.startDate}
+                onChange={(date) =>
+                  setFormData({ ...formData, startDate: date })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+              <TimePicker
+                label="Hora de Início"
+                value={formData.startTime}
+                onChange={(time) =>
+                  setFormData({ ...formData, startTime: time })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+            </Box>
+            <Box display="flex" gap={2} marginY={2}>
+              <DatePicker
+                label="Data de Fim"
+                value={formData.endDate}
+                onChange={(date) =>
+                  setFormData({ ...formData, endDate: date })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+              <TimePicker
+                label="Hora de Fim"
+                value={formData.endTime}
+                onChange={(time) =>
+                  setFormData({ ...formData, endTime: time })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+            </Box>
+          </LocalizationProvider>
           <TextField
             label="Comentários"
             name="desc"
@@ -97,11 +122,11 @@ const FormAgenda = ({ open, handleClose, handleSubmit, pacientes }) => {
               onChange={handleChange}
               label="Cor do Evento"
             >
-              <MenuItem value="blue" style={{ color: "blue" }}>Azul</MenuItem>
-              <MenuItem value="yellow" style={{ color: "yellow" }}>Amarelo</MenuItem>
-              <MenuItem value="rgba(255, 0, 0, 0.6)" style={{ color: "rgba(255, 0, 0, 0.6)" }}>Vermelho</MenuItem>
-              <MenuItem value="lightGreen" style={{ color: "lightgreen" }}>Verde</MenuItem>
-              <MenuItem value="purple" style={{ color: "purple" }}>Roxo</MenuItem>
+              <MenuItem value="blue" style={{ color: 'blue' }}>Azul</MenuItem>
+              <MenuItem value="yellow" style={{ color: 'yellow' }}>Amarelo</MenuItem>
+              <MenuItem value="rgba(255, 0, 0, 0.6)" style={{ color: 'rgba(255, 0, 0, 0.6)' }}>Vermelho</MenuItem>
+              <MenuItem value="lightGreen" style={{ color: 'lightgreen' }}>Verde</MenuItem>
+              <MenuItem value="purple" style={{ color: 'purple' }}>Roxo</MenuItem>
             </Select>
           </FormControl>
           <FormControl fullWidth margin="normal">
@@ -140,9 +165,9 @@ const FormAgenda = ({ open, handleClose, handleSubmit, pacientes }) => {
             fullWidth
             sx={{
               mt: 2,
-              borderRadius: "34px",
-              backgroundColor: "#A77E81",
-              "&:hover": { backgroundColor: "#945E62" },
+              borderRadius: '34px',
+              backgroundColor: '#A77E81',
+              '&:hover': { backgroundColor: '#945E62' },
             }}
           >
             Registrar Consulta
