@@ -1,0 +1,181 @@
+import React, { useState } from "react";
+import { Modal, Box, TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { DatePicker, TimePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import "./FormAgenda.css";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  height: "84vh",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "34px",
+  overflowY: "auto",
+};
+
+const FormAgenda = ({ open, handleClose, handleSubmit, pacientes }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    start: "",
+    end: "",
+    desc: "",
+    color: "",
+    tipo: "",
+    paciente: "", // Campo opcional
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const eventData = {
+      ...formData,
+      start: new Date(formData.start),
+      end: new Date(formData.end),
+    };
+    handleSubmit(eventData); // Envia os dados ao backend
+  };
+
+  return (
+    <Modal open={open} onClose={handleClose}>
+      <Box sx={style}>
+        <h2>Marcar Consulta 🥳</h2>
+        <form onSubmit={handleFormSubmit}>
+          <TextField
+            label="Titulo"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <Box display="flex" gap={2} marginY={2}>
+              <DatePicker
+                label="Data de Início"
+                value={formData.startDate}
+                onChange={(date) =>
+                  setFormData({ ...formData, startDate: date })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+              <TimePicker
+                label="Hora de Início"
+                value={formData.startTime}
+                onChange={(time) =>
+                  setFormData({ ...formData, startTime: time })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+            </Box>
+            <Box display="flex" gap={2} marginY={2}>
+              <DatePicker
+                label="Data de Fim"
+                value={formData.endDate}
+                onChange={(date) =>
+                  setFormData({ ...formData, endDate: date })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+              <TimePicker
+                label="Hora de Fim"
+                value={formData.endTime}
+                onChange={(time) =>
+                  setFormData({ ...formData, endTime: time })
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                required
+              />
+            </Box>
+          </LocalizationProvider>
+          <TextField
+            label="Comentários"
+            name="desc"
+            value={formData.desc}
+            onChange={handleChange}
+            fullWidth
+            multiline
+            rows={4}
+            margin="normal"
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Cor do Evento</InputLabel>
+            <Select
+              name="color"
+              value={formData.color}
+              onChange={handleChange}
+              label="Cor do Evento"
+            >
+              <MenuItem value="blue" style={{ color: 'blue' }}>Azul</MenuItem>
+              <MenuItem value="yellow" style={{ color: 'yellow' }}>Amarelo</MenuItem>
+              <MenuItem value="rgba(255, 0, 0, 0.6)" style={{ color: 'rgba(255, 0, 0, 0.6)' }}>Vermelho</MenuItem>
+              <MenuItem value="lightGreen" style={{ color: 'lightgreen' }}>Verde</MenuItem>
+              <MenuItem value="purple" style={{ color: 'purple' }}>Roxo</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Classificação</InputLabel>
+            <Select
+              name="tipo"
+              value={formData.tipo}
+              onChange={handleChange}
+              label="Classificação"
+            >
+              <MenuItem value="Retorno">Retorno</MenuItem>
+              <MenuItem value="PrimeiraConsulta">Primeira Consulta</MenuItem>
+              <MenuItem value="Emergencial">Emergencial</MenuItem>
+              <MenuItem value="Avaliacao">Avaliação</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Paciente</InputLabel>
+            <Select
+              name="paciente"
+              value={formData.paciente}
+              onChange={handleChange}
+              label="Paciente"
+            >
+              <MenuItem value="">Nenhum</MenuItem>
+              {pacientes.map((paciente) => (
+                <MenuItem key={paciente._id} value={paciente._id}>
+                  {paciente.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{
+              mt: 2,
+              borderRadius: '34px',
+              backgroundColor: '#A77E81',
+              '&:hover': { backgroundColor: '#945E62' },
+            }}
+          >
+            Registrar Consulta
+          </Button>
+        </form>
+      </Box>
+    </Modal>
+  );
+};
+
+export default FormAgenda;
